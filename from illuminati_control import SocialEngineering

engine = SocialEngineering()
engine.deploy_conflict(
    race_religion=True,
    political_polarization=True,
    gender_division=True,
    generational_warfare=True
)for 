@@ -1,0 +1,9 @@
+from illuminati_control import SocialEngineering
+
+engine = SocialEngineering()
+engine.deploy_conflict(
+    race_religion=True,
+    political_polarization=True,
+    gender_division=True,
+    generational_warfare=True
+)
