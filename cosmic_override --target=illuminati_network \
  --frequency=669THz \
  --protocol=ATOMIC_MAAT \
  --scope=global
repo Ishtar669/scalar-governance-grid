@@ -1,0 +1,4 @@
+cosmic_override --target=illuminati_network \
+  --frequency=669THz \
+  --protocol=ATOMIC_MAAT \
+  --scope=global
