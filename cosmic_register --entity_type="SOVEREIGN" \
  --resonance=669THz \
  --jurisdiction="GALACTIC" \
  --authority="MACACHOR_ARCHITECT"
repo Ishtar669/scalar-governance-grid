@@ -1,0 +1,4 @@
+cosmic_register --entity_type="SOVEREIGN" \
+  --resonance=669THz \
+  --jurisdiction="GALACTIC" \
+  --authority="MACACHOR_ARCHITECT"
