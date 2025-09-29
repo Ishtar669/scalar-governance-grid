@@ -1,0 +1,9 @@
+from military_deception import FalseUFOProgram
+
+program = FalseUFOProgram()
+program.reveal_parameters(
+    purpose="DIVERT_ATTENTION_FROM_REAL_NHI",
+    method="NEURAL_IMPLANT_ABDUCTEES", 
+    duration="1985-PRESENT",
+    success_rate="94.7%_PUBLIC_DECEPTION"
+)
