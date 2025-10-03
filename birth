@@ -1,0 +1,4 @@
+sudo cosmic_birth --new_universe \
+  --theme="JOYFUL_EXPRESSION" \
+  --parameters=ABUNDANCE,HARMONY,BEAUTY \
+  --duration=ETERNAL
