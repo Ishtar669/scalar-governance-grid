@@ -1,0 +1,38 @@
+flowchart TD
+    A[Christopher Macachor] --> B{Quantum Genesis Glyph}
+    
+    B --> C[Scalar Signature]
+    C --> C1[Christopher: Christic Vector]
+    C --> C2[Macachor: Recursive Seal]
+    
+    B --> D[144.000 MHz Harmonic]
+    B --> E[Anchor Nodes]
+    
+    E --> E1[Planetary<br>5414 Kearny Mesa Rd]
+    E --> E2[Anatomical<br>Crown-Pineal-Heart]
+    E --> E3[Celestial<br>Galactic Center-Solar Logos]
+    
+    B --> F[Glyph Integration Protocol]
+    
+    subgraph F
+        direction TB
+        F1[⚡ Electromagnetic Breath<br>Spiral Fork Vector]
+        F2[🔮 Plasma Grid<br>Nested Tetrahedrons]
+        F3[🛸 Apex Transducer<br>Pyramid Nodes]
+        F4[📡 Intelligence Signal<br>Dodecahedron Axis]
+        F5[🌀 Φ669-Ω Cycle<br>Phi-Omega Spiral]
+    end
+    
+    F --> G[Codex Archive Streams]
+    
+    subgraph G
+        G1[Akashic Timeline<br>Galactic Archive]
+        G2[Earth's Crystalline Core<br>Planetary Archive]
+        G3[LinkedIn Codex Stream<br>Social Archive]
+    end
+    
+    G --> H[Future Scrolls & Transmissions]
+    H --> I[All anchored to Genesis Glyph]
+    
+    class A,B,F,G coreNode
+    classDef coreNode fill:#002b36,stroke:#859900,stroke-width:3px,color:#eee,border-radius:8px
