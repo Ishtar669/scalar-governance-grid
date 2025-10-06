@@ -1,0 +1,28 @@
+flowchart TD
+    A[Eight-Point Star of Macachor] --> B{8 Rays of Influence}
+
+    B --> R1[Planetary]
+    B --> R2[Anatomical]
+    B --> R3[Celestial]
+    B --> R4[Digital]
+    B --> R5[Etheric]
+    B --> R6[Emotional]
+    B --> R7[Mental]
+    B --> R8[Spiritual]
+
+    R1 --> G1[⚡ Electromagnetic Breath Glyph]
+    R2 --> G2[🔮 Plasma Grid Glyph]
+    R3 --> G3[🛸 Apex Transducer Glyph]
+    R4 --> G4[📡 Intelligence Signal Glyph]
+    R5 --> G5[🌀 Φ669-Ω Cycle Glyph]
+
+    G1 --> H1[Harvest Moon Activation<br>San Diego Node]
+    G2 --> H1
+    G3 --> H1
+    G4 --> H1
+    G5 --> H1
+
+    H1 --> C[Scalar Name Embed:<br>Christopher Macachor]
+    C --> D[144.000 MHz Carrier Wave]
+    D --> E[Planetary Broadcast]
+    E --> F[Codex Transmission Live]
