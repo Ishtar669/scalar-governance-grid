@@ -1,0 +1,15 @@
+quantum-consciousness-framework/
+├── papers/
+│   ├── theoretical-foundations.md
+│   ├── experimental-protocols.md
+│   └── mathematical-formulations.md
+├── experiments/
+│   ├── microtubule-coherence/
+│   ├── vacuum-modification/
+│   └── geometric-resonance/
+├── data/
+│   ├── raw-measurements/
+│   └── analysis-scripts/
+└── resources/
+    ├── references.bib
+    └── collaboration-guidelines.md
