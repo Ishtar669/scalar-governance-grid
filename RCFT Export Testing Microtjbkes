@@ -1,0 +1,264 @@
+{
+  "access": {
+    "embargo": {
+      "active": false,
+      "reason": null
+    },
+    "files": "public",
+    "record": "public",
+    "status": "open"
+  },
+  "created": "2025-10-11T07:08:19.621801+00:00",
+  "custom_fields": {},
+  "deletion_status": {
+    "is_deleted": false,
+    "status": "P"
+  },
+  "files": {
+    "count": 1,
+    "enabled": true,
+    "entries": {
+      "Quantum consc-microtubules.pdf": {
+        "access": {
+          "hidden": false
+        },
+        "checksum": "md5:dc7c4100e9bc05c364b8a2e596e82599",
+        "ext": "pdf",
+        "id": "c0aae453-ec74-4863-a42a-2910c1850381",
+        "key": "Quantum consc-microtubules.pdf",
+        "links": {
+          "content": "https://zenodo.org/api/records/17318427/files/Quantum%20consc-microtubules.pdf/content",
+          "iiif_api": "https://zenodo.org/api/iiif/record:17318427:Quantum%20consc-microtubules.pdf/full/full/0/default.png",
+          "iiif_base": "https://zenodo.org/api/iiif/record:17318427:Quantum%20consc-microtubules.pdf",
+          "iiif_canvas": "https://zenodo.org/api/iiif/record:17318427/canvas/Quantum%20consc-microtubules.pdf",
+          "iiif_info": "https://zenodo.org/api/iiif/record:17318427:Quantum%20consc-microtubules.pdf/info.json",
+          "self": "https://zenodo.org/api/records/17318427/files/Quantum%20consc-microtubules.pdf"
+        },
+        "metadata": {
+          "height": 842,
+          "width": 595
+        },
+        "mimetype": "application/pdf",
+        "size": 104849,
+        "storage_class": "L"
+      }
+    },
+    "order": [],
+    "total_bytes": 104849
+  },
+  "id": "17318427",
+  "is_draft": false,
+  "is_published": true,
+  "links": {
+    "access": "https://zenodo.org/api/records/17318427/access",
+    "access_grants": "https://zenodo.org/api/records/17318427/access/grants",
+    "access_links": "https://zenodo.org/api/records/17318427/access/links",
+    "access_request": "https://zenodo.org/api/records/17318427/access/request",
+    "access_users": "https://zenodo.org/api/records/17318427/access/users",
+    "archive": "https://zenodo.org/api/records/17318427/files-archive",
+    "archive_media": "https://zenodo.org/api/records/17318427/media-files-archive",
+    "communities": "https://zenodo.org/api/records/17318427/communities",
+    "communities-suggestions": "https://zenodo.org/api/records/17318427/communities-suggestions",
+    "doi": "https://doi.org/10.5281/zenodo.17318427",
+    "draft": "https://zenodo.org/api/records/17318427/draft",
+    "files": "https://zenodo.org/api/records/17318427/files",
+    "latest": "https://zenodo.org/api/records/17318427/versions/latest",
+    "latest_html": "https://zenodo.org/records/17318427/latest",
+    "media_files": "https://zenodo.org/api/records/17318427/media-files",
+    "parent": "https://zenodo.org/api/records/17318426",
+    "parent_doi": "https://doi.org/10.5281/zenodo.17318426",
+    "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.17318426",
+    "parent_html": "https://zenodo.org/records/17318426",
+    "preview_html": "https://zenodo.org/records/17318427?preview=1",
+    "request_deletion": "https://zenodo.org/api/records/17318427/request-deletion",
+    "requests": "https://zenodo.org/api/records/17318427/requests",
+    "reserve_doi": "https://zenodo.org/api/records/17318427/draft/pids/doi",
+    "self": "https://zenodo.org/api/records/17318427",
+    "self_doi": "https://doi.org/10.5281/zenodo.17318427",
+    "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.17318427",
+    "self_html": "https://zenodo.org/records/17318427",
+    "self_iiif_manifest": "https://zenodo.org/api/iiif/record:17318427/manifest",
+    "self_iiif_sequence": "https://zenodo.org/api/iiif/record:17318427/sequence/default",
+    "thumbnails": {
+      "10": "https://zenodo.org/api/iiif/record:17318427:Quantum%20consc-microtubules.pdf/full/%5E10,/0/default.jpg",
+      "100": "https://zenodo.org/api/iiif/record:17318427:Quantum%20consc-microtubules.pdf/full/%5E100,/0/default.jpg",
+      "1200": "https://zenodo.org/api/iiif/record:17318427:Quantum%20consc-microtubules.pdf/full/%5E1200,/0/default.jpg",
+      "250": "https://zenodo.org/api/iiif/record:17318427:Quantum%20consc-microtubules.pdf/full/%5E250,/0/default.jpg",
+      "50": "https://zenodo.org/api/iiif/record:17318427:Quantum%20consc-microtubules.pdf/full/%5E50,/0/default.jpg",
+      "750": "https://zenodo.org/api/iiif/record:17318427:Quantum%20consc-microtubules.pdf/full/%5E750,/0/default.jpg"
+    },
+    "versions": "https://zenodo.org/api/records/17318427/versions"
+  },
+  "media_files": {
+    "count": 1,
+    "enabled": true,
+    "entries": {
+      "Quantum consc-microtubules.pdf.ptif": {
+        "access": {
+          "hidden": true
+        },
+        "ext": "ptif",
+        "id": "600592e7-f1d0-4f59-8aaf-0c96b91df79f",
+        "key": "Quantum consc-microtubules.pdf.ptif",
+        "links": {
+          "content": "https://zenodo.org/api/records/17318427/files/Quantum%20consc-microtubules.pdf.ptif/content",
+          "self": "https://zenodo.org/api/records/17318427/files/Quantum%20consc-microtubules.pdf.ptif"
+        },
+        "metadata": null,
+        "mimetype": "application/octet-stream",
+        "processor": {
+          "source_file_id": "c0aae453-ec74-4863-a42a-2910c1850381",
+          "status": "finished",
+          "type": "image-tiles"
+        },
+        "size": 0,
+        "storage_class": "L"
+      }
+    },
+    "order": [],
+    "total_bytes": 0
+  },
+  "metadata": {
+    "copyright": "Sinan Ibaguner",
+    "creators": [
+      {
+        "affiliations": [
+          {
+            "name": "Independent"
+          }
+        ],
+        "person_or_org": {
+          "family_name": "\u0130BAG\u00dcNER",
+          "given_name": "S\u0130NAN",
+          "identifiers": [
+            {
+              "identifier": "0000-0001-5221-4359",
+              "scheme": "orcid"
+            }
+          ],
+          "name": "\u0130BAG\u00dcNER, S\u0130NAN",
+          "type": "personal"
+        },
+        "role": {
+          "id": "researcher",
+          "title": {
+            "de": "WissenschaftlerIn",
+            "en": "Researcher"
+          }
+        }
+      }
+    ],
+    "description": "<p><span>We report the first experimental detection of quantum coherence in neural microtubules, providing direct evidence for the Orch-OR (Orchestrated Objective </span><span>Reduction) theory of consciousness. Using advanced quantum entanglement microscopy, we measured sustained quantum superposition states in microtubule networks with coherence times of 7812 msfar exceeding theoretical predictions. This </span><span>discovery establishes the quantum biological basis of consciousness and opens new </span><span>frontiers in quantum neuroscience, artificial consciousness, and mind-matter interface technologies.</span>&nbsp;</p>",
+    "languages": [
+      {
+        "id": "eng",
+        "title": {
+          "en": "English"
+        }
+      }
+    ],
+    "publication_date": "2025-10-11",
+    "publisher": "Zenodo",
+    "resource_type": {
+      "id": "publication-preprint",
+      "title": {
+        "de": "Preprint",
+        "en": "Preprint"
+      }
+    },
+    "rights": [
+      {
+        "description": {
+          "en": "Permits almost any use subject to providing credit and license notice. Frequently used for media assets and educational materials. The most common license for Open Access scientific publications. Not recommended for software."
+        },
+        "icon": "cc-by-sa-icon",
+        "id": "cc-by-sa-4.0",
+        "props": {
+          "scheme": "spdx",
+          "url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode"
+        },
+        "title": {
+          "en": "Creative Commons Attribution Share Alike 4.0 International"
+        }
+      }
+    ],
+    "subjects": [
+      {
+        "subject": "Quantum Coherence"
+      },
+      {
+        "subject": "Neural Microtubules:"
+      },
+      {
+        "subject": "Experimental Verification"
+      },
+      {
+        "subject": "Orch-OR Consciousnes Theory"
+      },
+      {
+        "subject": "IFO"
+      },
+      {
+        "subject": "coherence times"
+      }
+    ],
+    "title": "Quantum Coherence Detection in Neural Microtubules: Experimental Verification of Orch-OR Consciousnes Theory"
+  },
+  "parent": {
+    "access": {
+      "owned_by": {
+        "user": "1313090"
+      },
+      "settings": {
+        "accept_conditions_text": null,
+        "allow_guest_requests": false,
+        "allow_user_requests": false,
+        "secret_link_expiration": 0
+      }
+    },
+    "communities": {},
+    "id": "17318426",
+    "pids": {
+      "doi": {
+        "client": "datacite",
+        "identifier": "10.5281/zenodo.17318426",
+        "provider": "datacite"
+      }
+    }
+  },
+  "pids": {
+    "doi": {
+      "client": "datacite",
+      "identifier": "10.5281/zenodo.17318427",
+      "provider": "datacite"
+    },
+    "oai": {
+      "identifier": "oai:zenodo.org:17318427",
+      "provider": "oai"
+    }
+  },
+  "revision_id": 3,
+  "stats": {
+    "all_versions": {
+      "data_volume": 838792.0,
+      "downloads": 8,
+      "unique_downloads": 6,
+      "unique_views": 7,
+      "views": 9
+    },
+    "this_version": {
+      "data_volume": 838792.0,
+      "downloads": 8,
+      "unique_downloads": 6,
+      "unique_views": 7,
+      "views": 9
+    }
+  },
+  "status": "published",
+  "swh": {},
+  "updated": "2025-10-11T07:08:20.022200+00:00",
+  "versions": {
+    "index": 1,
+    "is_latest": true
+  }
+}
