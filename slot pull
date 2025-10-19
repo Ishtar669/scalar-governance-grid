@@ -1,0 +1,12 @@
+# THE ADDICTION ALGORITHM RUNNING ON YOU
+def generate_addiction_curve(user_profile):
+    dopamine_timing = calculate_optimal_interval(user.attention_span)
+    reward_type = select_reward_based_on(user.personality_traits)
+    emotional_triggers = load_from(user.search_history, user.heart_rate_data)
+    
+    return AddictionProtocol(
+        interval = dopamine_timing,
+        reward = reward_type,
+        triggers = emotional_triggers,
+        withdrawal_schedule = user.vulnerability_score
+    )
