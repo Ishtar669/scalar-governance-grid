@@ -1,0 +1,537 @@
+from typing import List, Tuple, Dict, Optional, Union
+import numpy as np
+import numpy.typing as npt
+from scipy.linalg import expm
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as animation
+
+# Re-import MacachorState from your previous definition
+# (Assuming MacachorState is available in the same scope or imported from a module)
+class MacachorState:
+    """
+    Advanced Macachor Scalar Framework State Implementation
+    Implements scalar-quaternion quantum states with enhanced features
+    """
+    
+    def __init__(self, 
+                 phi_0: complex, 
+                 phi_vec: List[complex], 
+                 orientation: str = "default") -> None:
+        # Enhanced initialization with validation
+        self.scalar: complex = complex(phi_0)
+        self.vector: npt.NDArray[np.complex_] = np.array(phi_vec, dtype=complex)
+        self.orientation: str = orientation
+        self.history: List[Dict] = []  # Track state evolution
+        self.time_points: List[float] = []  # Track evolution time
+        self._store_state("Initialized", 0.0)
+        
+        # Validate dimensions
+        if len(self.vector) != 3:
+            raise ValueError("Vector component must have exactly 3 elements (i,j,k basis)")
+    
+    def _store_state(self, note: str, time: float) -> None:
+        """Store state history for analysis"""
+        self.history.append({
+            'scalar': self.scalar,
+            'vector': self.vector.copy(),
+            'orientation': self.orientation,
+            'note': note,
+            'time': time
+        })
+        self.time_points.append(time)
+    
+    def __repr__(self) -> str:
+        return (f"MacachorState(\n"
+                f"  scalar={self.scalar:.3f},\n"
+                f"  vector={[f'{x:.3f}' for x in self.vector]},\n"
+                f"  orientation='{self.orientation}',\n"
+                f"  norm={self.norm():.4f}\n"
+                f")")
+
+    def norm(self) -> float:
+        """Calculate the norm of the state"""
+        return np.sqrt(np.abs(self.scalar)**2 + np.sum(np.abs(self.vector)**2))
+    
+    def normalize(self) -> None:
+        """Normalize the state to unit norm"""
+        current_norm = self.norm()
+        if current_norm > 0:
+            self.scalar /= current_norm
+            self.vector /= current_norm
+            self._store_state("Normalized", self.time_points[-1] if self.time_points else 0.0)
+    
+    def scalar_vector_entanglement(self) -> float:
+        """
+        Calculate scalar-vector entanglement measure
+        Returns entanglement entropy between scalar and vector components
+        """
+        # Construct density matrix for scalar-vector system
+        psi_total = np.array([self.scalar] + self.vector.tolist())
+        # rho_total = np.outer(psi_total, np.conj(psi_total)) # Not needed for 1x1 reduced density matrix
+        
+        # Partial trace over vector components to get scalar reduced density matrix
+        rho_scalar_prob = np.abs(self.scalar)**2  # Probability of scalar component
+        
+        # Calculate entanglement entropy
+        if rho_scalar_prob > 0 and rho_scalar_prob < 1:
+            entropy = -rho_scalar_prob * np.log(rho_scalar_prob) - (1-rho_scalar_prob) * np.log(1-rho_scalar_prob)
+        else:
+            entropy = 0.0
+            
+        return entropy
+    
+    def macachor_energy(self, 
+                       H_kinetic: npt.NDArray[np.complex_], 
+                       H_scalar: npt.NDArray[np.complex_], 
+                       H_vector: npt.NDArray[np.complex_], 
+                       H_mix: npt.NDArray[np.complex_]) -> float:
+        """
+        Calculate expectation value of Macachor Hamiltonian
+        """
+        # Construct full state vector
+        psi = np.array([self.scalar] + self.vector.tolist(), dtype=complex)
+        psi_dagger = np.conj(psi)
+        
+        # Calculate total Hamiltonian expectation
+        H_total = H_kinetic + H_scalar + H_vector + H_mix
+        energy = np.dot(psi_dagger, np.dot(H_total, psi)).real
+        
+        return energy
+
+    def evolve(self, 
+               Hamiltonian: npt.NDArray[np.complex_], 
+               dt: float, 
+               method: str = 'exact') -> None:
+        """
+        Enhanced evolution with multiple methods
+        """
+        h_bar = 1.0  # Natural units
+        
+        # Construct state vector
+        psi = np.array([self.scalar] + self.vector.tolist(), dtype=complex)
+        
+        if method == 'exact':
+            # Exact matrix exponential
+            Evolution_Operator = expm(-1j * Hamiltonian * dt / h_bar)
+        elif method == 'taylor':
+            # Taylor approximation (original method)
+            Identity = np.identity(len(psi), dtype=complex)
+            Evolution_Operator = Identity - 1j * Hamiltonian * dt / h_bar
+        else:
+            raise ValueError("Method must be 'exact' or 'taylor'")
+        
+        # Apply evolution
+        psi_new = np.dot(Evolution_Operator, psi)
+        
+        # Update state
+        self.scalar = psi_new[0]
+        self.vector = psi_new[1:]
+        current_time = self.time_points[-1] + dt if self.time_points else dt
+        self._store_state(f"Evolved dt={dt}, method={method}", current_time)
+
+    def measure(self, 
+                operator: npt.NDArray[np.complex_], 
+                collapse: bool = False) -> float:
+        """
+        Enhanced measurement with optional state collapse
+        """
+        psi = np.array([self.scalar] + self.vector.tolist(), dtype=complex)
+        psi_dagger = np.conj(psi)
+        
+        # Calculate expectation value
+        op_psi = np.dot(operator, psi)
+        expectation_value = np.dot(psi_dagger, op_psi).real
+        
+        if collapse:
+            # Simulate measurement collapse
+            eigenvalues, eigenvectors = np.linalg.eigh(operator)
+            probabilities = np.abs(np.dot(eigenvectors.T, psi))**2
+            probabilities /= np.sum(probabilities)  # Normalize
+            
+            # Collapse to eigenstate based on probabilities
+            chosen_idx = np.random.choice(len(eigenvalues), p=probabilities)
+            collapsed_state = eigenvectors[:, chosen_idx]
+            
+            self.scalar = collapsed_state[0]
+            self.vector = collapsed_state[1:]
+            current_time = self.time_points[-1] if self.time_points else 0.0
+            self._store_state(f"Collapsed to eigenvalue {eigenvalues[chosen_idx]:.3f}", current_time)
+        
+        return expectation_value
+
+    def quaternion_phase(self) -> npt.NDArray[np.complex_]:
+        """
+        Calculate the quaternion phase factors from vector components
+        """
+        Q_norm = np.sqrt(np.sum(np.abs(self.vector)**2))
+        if Q_norm > 0:
+            phase_factors = self.vector / Q_norm
+            return phase_factors
+        else:
+            return np.array([0+0j, 0+0j, 0+0j])
+
+    def macachor_uncertainty(self, 
+                            operator_A: npt.NDArray[np.complex_], 
+                            operator_B: npt.NDArray[np.complex_]) -> Tuple[float, float]:
+        """
+        Calculate Macachor-enhanced uncertainty relation
+        """
+        # Expectation values
+        exp_A = self.measure(operator_A)
+        exp_B = self.measure(operator_B)
+        
+        # Commutator expectation
+        commutator = np.dot(operator_A, operator_B) - np.dot(operator_B, operator_A)
+        exp_commutator = self.measure(commutator)
+        
+        # Enhanced uncertainty with scalar-vector correction
+        uncertainty = np.sqrt(
+            (self.measure(np.dot(operator_A, operator_A)) - exp_A**2) *
+            (self.measure(np.dot(operator_B, operator_B)) - exp_B**2)
+        )
+        
+        macachor_enhancement = np.abs(exp_commutator) / 2 + 0.1 * self.scalar_vector_entanglement()
+        
+        return uncertainty, macachor_enhancement
+
+    def plot_evolution(self, 
+                      show_components: bool = True,
+                      show_entanglement: bool = True,
+                      show_quaternion_space: bool = True) -> plt.Figure:
+        """
+        Comprehensive visualization of state evolution history
+        """
+        if len(self.history) < 2:
+            print("Insufficient history for plotting")
+            return None
+        
+        # Determine subplot layout
+        n_plots = sum([show_components, show_entanglement, show_quaternion_space])
+        if n_plots == 0:
+            return None
+            
+        fig, axes = plt.subplots(1, n_plots, figsize=(5*n_plots, 4))
+        if n_plots == 1:
+            axes = [axes]
+        
+        plot_idx = 0
+        times = self.time_points
+        
+        # Plot 1: Component evolution
+        if show_components:
+            scalar_mags = [np.abs(state['scalar']) for state in self.history]
+            vector_mags = [np.sqrt(sum(np.abs(v)**2 for v in state['vector'])) for state in self.history]
+            
+            axes[plot_idx].plot(times, scalar_mags, 'b-', label='|φ₀| (Scalar)', linewidth=2)
+            axes[plot_idx].plot(times, vector_mags, 'r--', label='|Q| (Vector)', linewidth=2)
+            axes[plot_idx].set_xlabel('Time')
+            axes[plot_idx].set_ylabel('Magnitude')
+            axes[plot_idx].set_title('Component Evolution')
+            axes[plot_idx].legend()
+            axes[plot_idx].grid(True, alpha=0.3)
+            plot_idx += 1
+        
+        # Plot 2: Entanglement evolution
+        if show_entanglement:
+            # Calculate entanglement for each historical state
+            entanglement_vals = []
+            for state in self.history:
+                temp_state = MacachorState(state['scalar'], state['vector'], "temp")
+                entanglement_vals.append(temp_state.scalar_vector_entanglement())
+            
+            axes[plot_idx].plot(times, entanglement_vals, 'g-', linewidth=2)
+            axes[plot_idx].set_xlabel('Time')
+            axes[plot_idx].set_ylabel('Entanglement Entropy')
+            axes[plot_idx].set_title('Scalar-Vector Entanglement')
+            axes[plot_idx].grid(True, alpha=0.3)
+            plot_idx += 1
+        
+        # Plot 3: Quaternion phase space (3D)
+        if show_quaternion_space and len(self.history) > 1:
+            # Extract vector components for 3D plot
+            vec_x = [state['vector'][0].real for state in self.history]
+            vec_y = [state['vector'][1].real for state in self.history] 
+            vec_z = [state['vector'][2].real for state in self.history]
+            
+            # Create 3D plot
+            ax_3d = fig.add_subplot(1, n_plots, plot_idx+1, projection='3d')
+            scatter = ax_3d.scatter(vec_x, vec_y, vec_z, c=times, cmap='viridis', s=50)
+            ax_3d.plot(vec_x, vec_y, vec_z, 'k-', alpha=0.3)
+            ax_3d.set_xlabel('Q₁ (Re)')
+            ax_3d.set_ylabel('Q₂ (Re)') 
+            ax_3d.set_zlabel('Q₃ (Re)')
+            ax_3d.set_title('Quaternion Vector Evolution')
+            plt.colorbar(scatter, ax=ax_3d, label='Time')
+        
+        plt.tight_layout()
+        return fig
+
+    def get_state_statistics(self) -> Dict[str, float]:
+        """
+        Compute comprehensive statistics about state evolution
+        """
+        if len(self.history) < 2:
+            return {}
+        
+        scalar_mags = [np.abs(state['scalar']) for state in self.history]
+        vector_mags = [np.sqrt(sum(np.abs(v)**2 for v in state['vector'])) for state in self.history]
+        
+        # Calculate entanglement history
+        entanglement_vals = []
+        for state in self.history:
+            temp_state = MacachorState(state['scalar'], state['vector'], "temp")
+            entanglement_vals.append(temp_state.scalar_vector_entanglement())
+        
+        return {
+            'scalar_mean': float(np.mean(scalar_mags)),
+            'scalar_std': float(np.std(scalar_mags)),
+            'vector_mean': float(np.mean(vector_mags)),
+            'vector_std': float(np.std(vector_mags)),
+            'entanglement_mean': float(np.mean(entanglement_vals)),
+            'entanglement_max': float(np.max(entanglement_vals)),
+            'correlation': float(np.corrcoef(scalar_mags, vector_mags)[0,1]),
+            'total_evolution_time': self.time_points[-1] - self.time_points[0]
+        }
+
+# Enhanced Hamiltonian creation with type hints
+def create_macachor_hamiltonian(mass: float = 1.0, 
+                               scalar_potential: float = 0.1, 
+                               vector_coupling: float = 0.05, 
+                               mixing: float = 0.02) -> npt.NDArray[np.complex_]:
+    """Create a sample Macachor Hamiltonian with type hints"""
+    H_kinetic = np.array([
+        [1.0, 0.0, 0.0, 0.0],
+        [0.0, 0.5, 0.0, 0.0],
+        [0.0, 0.0, 0.5, 0.0],
+        [0.0, 0.0, 0.0, 0.5]
+    ], dtype=complex) / (2 * mass)
+
+    H_scalar = scalar_potential * np.array([
+        [1.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0]
+    ], dtype=complex)
+
+    H_vector = vector_coupling * np.array([
+        [0.0, 0.0, 0.0, 0.0],
+        [0.0, 1.0, 0.2, 0.2],
+        [0.0, 0.2, 1.0, 0.2],
+        [0.0, 0.2, 0.2, 1.0]
+    ], dtype=complex)
+
+    H_mix = mixing * np.array([
+        [0.0, 0.1, 0.1, 0.1],
+        [0.1, 0.0, 0.0, 0.0],
+        [0.1, 0.0, 0.0, 0.0],
+        [0.1, 0.0, 0.0, 0.0]
+    ], dtype=complex)
+
+    return H_kinetic + H_scalar + H_vector + H_mix
+
+
+class MacachorField:
+    """
+    Represents a 1D lattice of coupled MacachorState instances.
+    Implements field-level evolution and visualization.
+    """
+    
+    def __init__(self, 
+                 num_sites: int, 
+                 initial_states: Optional[List[MacachorState]] = None,
+                 interaction_strength: float = 0.1) -> None:
+        
+        self.num_sites = num_sites
+        self.interaction_strength = interaction_strength
+        self.site_dimension = 4 # Each MacachorState has (scalar + 3-vector)
+        
+        if initial_states:
+            if len(initial_states) != num_sites:
+                raise ValueError(f"Expected {num_sites} initial states, but got {len(initial_states)}")
+            self.sites = initial_states
+        else:
+            # Initialize with default, normalized states if not provided
+            self.sites = []
+            for i in range(num_sites):
+                state = MacachorState(phi_0=1/np.sqrt(2), phi_vec=[0, 1/np.sqrt(2), 0], orientation=f"site_{i}")
+                state.normalize()
+                self.sites.append(state)
+        
+        self.field_history: List[List[Dict]] = [] # History of all sites at each time step
+        self.field_time_points: List[float] = []
+        self._store_field_state(0.0)
+
+    def _get_full_state_vector(self) -> npt.NDArray[np.complex_]:
+        """
+        Concatenates all individual MacachorState vectors into one large field vector.
+        """
+        full_psi = []
+        for state in self.sites:
+            full_psi.extend([state.scalar] + state.vector.tolist())
+        return np.array(full_psi, dtype=complex)
+
+    def _set_states_from_full_vector(self, full_psi: npt.NDArray[np.complex_]) -> None:
+        """
+        Updates individual MacachorState instances from a full field vector.
+        """
+        for i, state in enumerate(self.sites):
+            start_idx = i * self.site_dimension
+            end_idx = start_idx + self.site_dimension
+            state_vec = full_psi[start_idx:end_idx]
+            state.scalar = state_vec[0]
+            state.vector = state_vec[1:]
+            # Clear individual history, as field history tracks global evolution
+            state.history.clear() 
+            state.time_points.clear()
+            state._store_state("Updated by field evolution", self.field_time_points[-1] if self.field_time_points else 0.0)
+
+
+    def create_field_hamiltonian(self, 
+                                 local_H_template: npt.NDArray[np.complex_]) -> npt.NDArray[np.complex_]:
+        """
+        Creates a block Hamiltonian for the entire field, including local
+        and nearest-neighbor interaction terms.
+        """
+        total_dim = self.num_sites * self.site_dimension
+        H_field = np.zeros((total_dim, total_dim), dtype=complex)
+
+        # Local Hamiltonians for each site (diagonal blocks)
+        for i in range(self.num_sites):
+            start_idx = i * self.site_dimension
+            end_idx = start_idx + self.site_dimension
+            H_field[start_idx:end_idx, start_idx:end_idx] = local_H_template
+
+        # Nearest-neighbor interaction terms (off-diagonal blocks)
+        # Using a simple interaction that couples components directly
+        interaction_matrix = self.interaction_strength * np.identity(self.site_dimension, dtype=complex)
+        
+        for i in range(self.num_sites - 1):
+            # i to i+1 coupling
+            start_i = i * self.site_dimension
+            end_i = start_i + self.site_dimension
+            start_j = (i + 1) * self.site_dimension
+            end_j = start_j + self.site_dimension
+
+            # H_field[start_i:end_i, start_j:end_j] = interaction_matrix # Uncomment for off-diagonal interaction
+            # H_field[start_j:end_j, start_i:end_i] = interaction_matrix.conj().T # And its Hermitian conjugate
+
+            # A more common interaction is a hopping term or an entanglement-inducing term
+            # For simplicity, let's add a "mixing" term that couples the scalar of site i to vector of site i+1
+            # and vice-versa, as part of the total field Hamiltonian
+            # This makes the Hamiltonian truly non-block-diagonal
+
+            # Example: coupling scalar of site i to first vector component of site i+1
+            # and first vector component of site i to scalar of site i+1
+            H_field[start_i, start_j + 1] += self.interaction_strength * 0.5 # Scalar_i -> Vector_i+1_x
+            H_field[start_j + 1, start_i] += self.interaction_strength * 0.5 # Hermitian conjugate
+            
+            # Additional coupling terms
+            H_field[start_i + 1, start_j] += self.interaction_strength * 0.5 # Vector_i_x -> Scalar_i+1
+            H_field[start_j, start_i + 1] += self.interaction_strength * 0.5 # Hermitian conjugate
+
+
+        return H_field
+    
+    def _store_field_state(self, time: float) -> None:
+        """Stores a snapshot of all MacachorStates in the field."""
+        snapshot = []
+        for state in self.sites:
+            snapshot.append({
+                'scalar': state.scalar,
+                'vector': state.vector.copy(),
+                'orientation': state.orientation,
+                'norm': state.norm(),
+                'entanglement': state.scalar_vector_entanglement()
+            })
+        self.field_history.append(snapshot)
+        self.field_time_points.append(time)
+
+    def evolve_field(self, 
+                     field_hamiltonian: npt.NDArray[np.complex_], 
+                     dt: float, 
+                     method: str = 'exact') -> None:
+        """
+        Evolves the entire Macachor field using a global Hamiltonian.
+        """
+        h_bar = 1.0
+        full_psi = self._get_full_state_vector()
+        
+        if method == 'exact':
+            Evolution_Operator = expm(-1j * field_hamiltonian * dt / h_bar)
+        elif method == 'taylor':
+            Identity = np.identity(len(full_psi), dtype=complex)
+            Evolution_Operator = Identity - 1j * field_hamiltonian * dt / h_bar
+        else:
+            raise ValueError("Method must be 'exact' or 'taylor'")
+            
+        new_full_psi = np.dot(Evolution_Operator, full_psi)
+        self._set_states_from_full_vector(new_full_psi)
+        
+        current_time = self.field_time_points[-1] + dt if self.field_time_points else dt
+        self._store_field_state(current_time)
+
+
+    def plot_field_evolution(self, 
+                             param_to_plot: str = 'scalar_magnitude',
+                             frames: int = 50,
+                             interval: int = 100) -> None:
+        """
+        Creates an animation showing the evolution of a chosen parameter
+        (e.g., scalar_magnitude, vector_magnitude, entanglement) across the lattice.
+        """
+        if len(self.field_history) < 2:
+            print("Insufficient field history for plotting animation.")
+            return
+
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        # Prepare data for animation
+        data_frames = []
+        max_val = 0.0 # For consistent y-axis scaling
+        min_val = 1.0
+        
+        for snapshot in self.field_history:
+            if param_to_plot == 'scalar_magnitude':
+                vals = [np.abs(state['scalar']) for state in snapshot]
+                title = "Macachor Scalar Magnitude Evolution"
+            elif param_to_plot == 'vector_magnitude':
+                vals = [state['norm'] - np.abs(state['scalar']) if state['norm'] > np.abs(state['scalar']) else 0 for state in snapshot] # Approx vector magnitude
+                # vals = [np.sqrt(np.sum(np.abs(state['vector'])**2)) for state in snapshot] # This is more accurate but need to re-calc
+                title = "Macachor Vector Magnitude Evolution"
+            elif param_to_plot == 'entanglement':
+                vals = [state['entanglement'] for state in snapshot]
+                title = "Macachor Scalar-Vector Entanglement Evolution"
+            else:
+                raise ValueError("param_to_plot must be 'scalar_magnitude', 'vector_magnitude', or 'entanglement'")
+            
+            data_frames.append(vals)
+            max_val = max(max_val, max(vals))
+            min_val = min(min_val, min(vals))
+            
+        x = np.arange(self.num_sites) # Lattice sites
+        line, = ax.plot(x, data_frames[0], 'o-', label=param_to_plot.replace('_', ' ').title())
+
+        ax.set_xlim(-0.5, self.num_sites - 0.5)
+        ax.set_ylim(min_val * 0.9, max_val * 1.1)
+        ax.set_xlabel("Lattice Site")
+        ax.set_ylabel(param_to_plot.replace('_', ' ').title())
+        ax.set_title(title)
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+        
+        time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes) # For displaying current time
+
+        def update(frame):
+            line.set_ydata(data_frames[frame])
+            current_time = self.field_time_points[frame]
+            time_text.set_text(f'Time: {current_time:.2f}')
+            return line, time_text
+
+        ani = animation.FuncAnimation(
+            fig, update, frames=len(data_frames), interval=interval, blit=True, repeat=True
+        )
+        
+        plt.show()
+        print(f"Animation saved as {param_to_plot}_field_evolution.gif")
+        ani.save(f'{param_to_plot}_field_evolution.gif', writer='pillow', fps=10) # Save as GIF
