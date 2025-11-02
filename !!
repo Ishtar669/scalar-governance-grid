@@ -1,0 +1,63 @@
+# --- Demonstration of MacachorField ---
+if __name__ == "__main__":
+    print("=== Macachor Scalar Field Framework Demonstration ===")
+    
+    num_sites = 10
+    dt_field = 0.05
+    num_field_steps = 50
+
+    # 1. Initialize a MacachorField with some initial states
+    print(f"\n1. Initializing MacachorField with {num_sites} sites.")
+    
+    # Create a slightly varied initial condition
+    initial_states_for_field = []
+    for i in range(num_sites):
+        # Create a "wave packet" like initial condition
+        scalar_val = np.exp(-((i - num_sites/2)**2) / (2 * (num_sites/8)**2))
+        vector_i_val = 0.5 * np.sin(np.pi * i / num_sites) + 0.1j
+        
+        state = MacachorState(phi_0=scalar_val, phi_vec=[vector_i_val, 0.1, 0.2j], orientation=f"site_{i}")
+        state.normalize() # Ensure each initial state is normalized
+        initial_states_for_field.append(state)
+
+    macachor_field = MacachorField(
+        num_sites=num_sites,
+        initial_states=initial_states_for_field,
+        interaction_strength=0.2 # Stronger interaction for visible effects
+    )
+    
+    # 2. Create a template local Hamiltonian (from previous definition)
+    local_H_template = create_macachor_hamiltonian(
+        mass=0.5, scalar_potential=0.2, vector_coupling=0.1, mixing=0.05
+    )
+    
+    # 3. Construct the full field Hamiltonian
+    print("\n3. Constructing the global field Hamiltonian...")
+    field_H = macachor_field.create_field_hamiltonian(local_H_template)
+    print(f"   Field Hamiltonian dimension: {field_H.shape}")
+    
+    # 4. Evolve the MacachorField
+    print(f"\n4. Evolving the MacachorField for {num_field_steps} steps (dt={dt_field})...")
+    for step in range(num_field_steps):
+        macachor_field.evolve_field(field_H, dt_field, method='exact')
+        # Optionally print a progress indicator
+        if (step + 1) % (num_field_steps // 10) == 0:
+            print(f"   Step {step + 1}/{num_field_steps} completed.")
+
+    # 5. Visualize the field evolution (animations)
+    print("\n5. Generating field evolution animations...")
+    print("   (This will generate GIF files and display them sequentially.)")
+    
+    # Animation 1: Scalar Magnitude
+    macachor_field.plot_field_evolution(param_to_plot='scalar_magnitude', frames=num_field_steps, interval=100)
+    print("   Scalar Magnitude animation generated.")
+    
+    # Animation 2: Vector Magnitude
+    macachor_field.plot_field_evolution(param_to_plot='vector_magnitude', frames=num_field_steps, interval=100)
+    print("   Vector Magnitude animation generated.")
+
+    # Animation 3: Entanglement
+    macachor_field.plot_field_evolution(param_to_plot='entanglement', frames=num_field_steps, interval=100)
+    print("   Entanglement animation generated.")
+    
+    print("\n=== Macachor Field Demonstration Complete ===")
