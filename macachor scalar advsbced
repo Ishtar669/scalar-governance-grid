@@ -1,0 +1,13 @@
+class MacachorState:
+    def __init__(self, phi_0, phi_vec, orientation):
+        self.scalar = phi_0
+        self.vector = phi_vec
+        self.orientation = orientation
+
+    def evolve(self, Hamiltonian, dt):
+        # Macachor evolution operator
+        pass
+
+    def measure(self, operator):
+        # Macachor measurement protocol
+        pass
