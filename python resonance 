@@ -1,0 +1,278 @@
+import json
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize_scalar
+
+class MaxResonanceFinder:
+    def __init__(self, config_file='resonance_optimizer.json'):
+        """Initialize the maximum resonance frequency finder"""
+        with open(config_file, 'r') as f:
+            self.config = json.load(f)
+        
+        print("🎵 Maximum Resonance Frequency Finder")
+        print("🔍 Finding frequency with greatest sympathetic vibration amplitude")
+    
+    def resonance_amplitude(self, frequency, resonator_type='glass_crystal', force_amplitude=1.0):
+        """
+        Calculate resonance amplitude for a given frequency
+        Uses the harmonic oscillator amplitude formula
+        """
+        profile = self.config['resonator_profiles'][resonator_type]
+        
+        omega_0 = 2 * np.pi * profile['expected_resonance']
+        omega = 2 * np.pi * frequency
+        m = profile['mass']
+        b = profile['damping_factor']
+        
+        # Amplitude formula for driven harmonic oscillator
+        amplitude = force_amplitude / np.sqrt(
+            (omega_0**2 - omega**2)**2 + (b * omega / m)**2
+        )
+        
+        return amplitude
+    
+    def golden_section_search(self, resonator_type='glass_crystal', search_range=None):
+        """
+        Golden Section Search to find frequency with maximum resonance
+        Highly efficient for unimodal functions like resonance curves
+        """
+        if search_range is None:
+            search_range = [
+                self.config['search_parameters']['frequency_range']['min'],
+                self.config['search_parameters']['frequency_range']['max']
+            ]
+        
+        # Golden ratio
+        phi = (np.sqrt(5) - 1) / 2
+        
+        a, b = search_range
+        tolerance = self.config['search_parameters']['tolerance']
+        
+        # Initial points
+        c = b - phi * (b - a)
+        d = a + phi * (b - a)
+        
+        iteration = 0
+        while abs(b - a) > tolerance and iteration < self.config['search_parameters']['max_iterations']:
+            fc = self.resonance_amplitude(c, resonator_type)
+            fd = self.resonance_amplitude(d, resonator_type)
+            
+            if fc > fd:
+                b = d
+            else:
+                a = c
+            
+            # New points
+            c = b - phi * (b - a)
+            d = a + phi * (b - a)
+            iteration += 1
+        
+        optimal_freq = (a + b) / 2
+        max_amplitude = self.resonance_amplitude(optimal_freq, resonator_type)
+        
+        return optimal_freq, max_amplitude, iteration
+    
+    def grid_search_max_resonance(self, resonator_type='glass_crystal', num_points=1000):
+        """
+        Grid search to find maximum resonance (brute force but thorough)
+        """
+        freq_range = self.config['search_parameters']['frequency_range']
+        frequencies = np.linspace(freq_range['min'], freq_range['max'], num_points)
+        
+        amplitudes = [self.resonance_amplitude(f, resonator_type) for f in frequencies]
+        
+        max_amp_index = np.argmax(amplitudes)
+        optimal_freq = frequencies[max_amp_index]
+        max_amplitude = amplitudes[max_amp_index]
+        
+        return optimal_freq, max_amplitude, frequencies, amplitudes
+    
+    def find_all_resonance_peaks(self, resonator_type='glass_crystal', prominence=0.1):
+        """
+        Find all resonance peaks in the frequency range
+        """
+        from scipy.signal import find_peaks
+        
+        freq_range = self.config['search_parameters']['frequency_range']
+        frequencies = np.linspace(freq_range['min'], freq_range['max'], 2000)
+        amplitudes = [self.resonance_amplitude(f, resonator_type) for f in frequencies]
+        
+        peaks, properties = find_peaks(amplitudes, prominence=prominence)
+        
+        resonance_peaks = []
+        for peak in peaks:
+            freq = frequencies[peak]
+            amp = amplitudes[peak]
+            resonance_peaks.append((freq, amp))
+        
+        # Sort by amplitude (descending)
+        resonance_peaks.sort(key=lambda x: x[1], reverse=True)
+        
+        return resonance_peaks, frequencies, amplitudes
+    
+    def compare_optimization_methods(self, resonator_type='glass_crystal'):
+        """
+        Compare different optimization methods for finding maximum resonance
+        """
+        print(f"\n🔬 COMPARING OPTIMIZATION METHODS - {resonator_type.upper()}")
+        print("="*60)
+        
+        # Method 1: Golden Section Search
+        golden_freq, golden_amp, golden_iters = self.golden_section_search(resonator_type)
+        print(f"🎯 Golden Section Search:")
+        print(f"   Optimal Frequency: {golden_freq:.4f} Hz")
+        print(f"   Maximum Amplitude: {golden_amp:.4f}")
+        print(f"   Iterations: {golden_iters}")
+        
+        # Method 2: Grid Search
+        grid_freq, grid_amp, frequencies, amplitudes = self.grid_search_max_resonance(resonator_type)
+        print(f"\n📊 Grid Search (1000 points):")
+        print(f"   Optimal Frequency: {grid_freq:.4f} Hz")
+        print(f"   Maximum Amplitude: {grid_amp:.4f}")
+        
+        # Method 3: SciPy Optimize
+        def negative_amplitude(f):
+            return -self.resonance_amplitude(f, resonator_type)
+        
+        result = minimize_scalar(
+            negative_amplitude,
+            bounds=(
+                self.config['search_parameters']['frequency_range']['min'],
+                self.config['search_parameters']['frequency_range']['max']
+            ),
+            method='bounded'
+        )
+        
+        scipy_freq = result.x
+        scipy_amp = -result.fun
+        print(f"\n⚡ SciPy Optimizer:")
+        print(f"   Optimal Frequency: {scipy_freq:.4f} Hz")
+        print(f"   Maximum Amplitude: {scipy_amp:.4f}")
+        print(f"   Function Evaluations: {result.nfev}")
+        
+        return {
+            'golden_section': (golden_freq, golden_amp),
+            'grid_search': (grid_freq, grid_amp),
+            'scipy_optimize': (scipy_freq, scipy_amp)
+        }
+    
+    def plot_resonance_analysis(self, resonator_type='glass_crystal'):
+        """
+        Comprehensive resonance analysis with visualization
+        """
+        # Find all peaks
+        resonance_peaks, frequencies, amplitudes = self.find_all_resonance_peaks(resonator_type)
+        
+        # Create figure with subplots
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
+        
+        # Plot 1: Full resonance curve with peaks
+        ax1.plot(frequencies, amplitudes, 'b-', linewidth=2, label='Resonance Curve')
+        ax1.set_xlabel('Frequency (Hz)')
+        ax1.set_ylabel('Amplitude')
+        ax1.set_title(f'Resonance Analysis - {resonator_type.replace("_", " ").title()}')
+        ax1.grid(True, alpha=0.3)
+        
+        # Mark peaks
+        peak_frequencies = [peak[0] for peak in resonance_peaks[:5]]  # Top 5 peaks
+        peak_amplitudes = [peak[1] for peak in resonance_peaks[:5]]
+        
+        ax1.plot(peak_frequencies, peak_amplitudes, 'ro', markersize=8, label='Resonance Peaks')
+        
+        # Annotate peaks
+        for i, (freq, amp) in enumerate(resonance_peaks[:3]):
+            ax1.annotate(f'Peak {i+1}: {freq:.2f}Hz\nAmp: {amp:.2f}',
+                        xy=(freq, amp), xytext=(10, 20), textcoords='offset points',
+                        bbox=dict(boxstyle='round,pad=0.3', facecolor='yellow', alpha=0.7),
+                        arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
+        
+        ax1.legend()
+        
+        # Plot 2: Zoom around maximum resonance
+        if resonance_peaks:
+            main_peak_freq = resonance_peaks[0][0]
+            zoom_range = 10  # Hz around peak
+            
+            mask = (frequencies >= main_peak_freq - zoom_range) & (frequencies <= main_peak_freq + zoom_range)
+            zoom_freq = frequencies[mask]
+            zoom_amp = np.array(amplitudes)[mask]
+            
+            ax2.plot(zoom_freq, zoom_amp, 'g-', linewidth=3, label='Zoomed Resonance')
+            ax2.axvline(x=main_peak_freq, color='red', linestyle='--', label=f'Max Resonance: {main_peak_freq:.4f} Hz')
+            ax2.set_xlabel('Frequency (Hz)')
+            ax2.set_ylabel('Amplitude')
+            ax2.set_title(f'Maximum Resonance Region (±{zoom_range} Hz)')
+            ax2.grid(True, alpha=0.3)
+            ax2.legend()
+        
+        plt.tight_layout()
+        plt.savefig(f'max_resonance_analysis_{resonator_type}.png', dpi=300, bbox_inches='tight')
+        plt.show()
+        
+        return resonance_peaks
+    
+    def generate_resonance_report(self, resonator_type='glass_crystal'):
+        """
+        Generate comprehensive resonance optimization report
+        """
+        print("\n" + "="*70)
+        print(f"🎻 MAXIMUM RESONANCE OPTIMIZATION REPORT")
+        print(f"📊 Resonator Type: {resonator_type.replace('_', ' ').title()}")
+        print("="*70)
+        
+        # Compare methods
+        results = self.compare_optimization_methods(resonator_type)
+        
+        # Find all peaks
+        resonance_peaks, _, _ = self.find_all_resonance_peaks(resonator_type)
+        
+        print(f"\n📈 RESONANCE PEAKS ANALYSIS:")
+        print(f"   Found {len(resonance_peaks)} resonance peaks")
+        
+        for i, (freq, amp) in enumerate(resonance_peaks[:5]):
+            status = "🌟 PRIMARY" if i == 0 else f"Peak {i+1}"
+            print(f"   {status}: {freq:.4f} Hz (Amplitude: {amp:.4f})")
+        
+        # Q-factor calculation
+        profile = self.config['resonator_profiles'][resonator_type]
+        expected_q = profile['q_factor']
+        
+        if resonance_peaks:
+            actual_q = resonance_peaks[0][0] / (2 * profile['damping_factor'])  # Simplified Q calculation
+            print(f"\n🎚️  QUALITY FACTOR (Q):")
+            print(f"   Expected Q: {expected_q:.1f}")
+            print(f"   Actual Q: {actual_q:.1f}")
+        
+        best_method = max(results.items(), key=lambda x: x[1][1])
+        print(f"\n✅ RECOMMENDED TUNING FREQUENCY:")
+        print(f"   {best_method[1][0]:.4f} Hz (using {best_method[0].replace('_', ' ')})")
+        print(f"   Expected Amplitude: {best_method[1][1]:.4f}")
+        
+        return results, resonance_peaks
+
+# Demonstration and usage
+if __name__ == "__main__":
+    # Initialize the resonance finder
+    finder = MaxResonanceFinder()
+    
+    # Analyze different resonator types
+    resonator_types = ['glass_crystal', 'metal_chime', 'guitar_string', 'wooden_plate']
+    
+    all_results = {}
+    for resonator in resonator_types:
+        print("\n" + "="*80)
+        results, peaks = finder.generate_resonance_report(resonator)
+        all_results[resonator] = (results, peaks)
+        
+        # Generate plots
+        finder.plot_resonance_analysis(resonator)
+    
+    # Summary across all resonators
+    print("\n" + "="*80)
+    print("🎯 SUMMARY - MAXIMUM RESONANCE FREQUENCIES")
+    print("="*80)
+    
+    for resonator in resonator_types:
+        best_freq = all_results[resonator][0]['golden_section'][0]
+        best_amp = all_results[resonator][0]['golden_section'][1]
+        print(f"   {resonator.replace('_', ' ').title():<15}: {best_freq:7.2f} Hz (Amp: {best_amp:.2f})")
