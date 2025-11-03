@@ -1,0 +1,259 @@
+Here's a GitHub-focused implementation for "669 tuning" - likely referring to frequency tuning related to sympathetic vibration and resonance (building on the cm669 concept).
+
+1. JSON Configuration (Tuning Parameters)
+
+Create tuning_parameters_669.json:
+
+```json
+{
+  "tuning_id": "669",
+  "name": "Sympathetic Vibration Tuning System",
+  "description": "Frequency tuning parameters for resonance and sympathetic vibration experiments",
+  "base_frequency": 669.0,
+  "frequency_units": "Hz",
+  "author": "Christopher Macachor",
+  "reference": "Sympathetic vibration is the cause of another frequency vibration of higher amplitude resulting in resonance.",
+  
+  "tuning_sets": {
+    "harmonic_series": {
+      "description": "Harmonic frequencies based on 669Hz fundamental",
+      "frequencies": {
+        "fundamental": 669.0,
+        "first_overtone": 1338.0,
+        "second_overtone": 2007.0,
+        "third_overtone": 2676.0,
+        "fifth": 1003.5,
+        "octave": 1338.0
+      }
+    },
+    
+    "resonance_test": {
+      "description": "Frequencies for resonance testing around 669Hz",
+      "sweep_range": {
+        "start": 659.0,
+        "end": 679.0,
+        "step": 0.1
+      },
+      "test_points": [665.0, 667.0, 669.0, 671.0, 673.0]
+    },
+    
+    "material_resonance": {
+      "description": "Common material resonance frequencies near 669Hz",
+      "materials": {
+        "glass_crystal": [670.0, 669.5, 671.0],
+        "metal_rod_30cm": [668.0, 669.0, 672.0],
+        "wooden_plate": [665.0, 667.0, 670.0]
+      }
+    }
+  },
+  
+  "calibration": {
+    "tolerance": 0.1,
+    "max_amplitude": 5.0,
+    "damping_factors": [0.01, 0.05, 0.1, 0.2]
+  }
+}
+```
+
+2. Python Tuning System
+
+Create frequency_tuner_669.py:
+
+```python
+import json
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import signal
+
+class FrequencyTuner669:
+    def __init__(self, config_file='tuning_parameters_669.json'):
+        """Initialize the 669Hz tuning system"""
+        with open(config_file, 'r') as f:
+            self.config = json.load(f)
+        
+        self.base_freq = self.config['base_frequency']
+        print(f"🎵 669 Tuning System Initialized")
+        print(f"📊 Base Frequency: {self.base_freq} Hz")
+        print(f"💡 {self.config['reference']}")
+    
+    def calculate_harmonics(self, num_harmonics=8):
+        """Calculate harmonic series based on 669Hz"""
+        harmonics = {}
+        for i in range(1, num_harmonics + 1):
+            harmonics[f'harmonic_{i}'] = self.base_freq * i
+        
+        return harmonics
+    
+    def resonance_sweep(self, damping=0.05, force_amplitude=1.0):
+        """Perform frequency sweep to find resonance peaks"""
+        frequencies = np.linspace(
+            self.config['tuning_sets']['resonance_test']['sweep_range']['start'],
+            self.config['tuning_sets']['resonance_test']['sweep_range']['end'],
+            1000
+        )
+        
+        # Calculate amplitude response for damped harmonic oscillator
+        amplitudes = []
+        for f in frequencies:
+            amplitude = self._calculate_amplitude_response(f, damping, force_amplitude)
+            amplitudes.append(amplitude)
+        
+        return frequencies, np.array(amplitudes)
+    
+    def _calculate_amplitude_response(self, frequency, damping, force_amplitude):
+        """Calculate amplitude response for given frequency"""
+        omega_0 = 2 * np.pi * self.base_freq
+        omega = 2 * np.pi * frequency
+        m = 1.0  # mass (normalized)
+        b = damping  # damping coefficient
+        
+        # Amplitude formula for driven harmonic oscillator
+        amplitude = force_amplitude / np.sqrt(
+            (omega_0**2 - omega**2)**2 + (b * omega / m)**2
+        )
+        return amplitude
+    
+    def find_resonance_peak(self, frequencies, amplitudes):
+        """Find the exact resonance frequency from sweep data"""
+        peak_index = np.argmax(amplitudes)
+        resonance_freq = frequencies[peak_index]
+        max_amplitude = amplitudes[peak_index]
+        
+        return resonance_freq, max_amplitude
+    
+    def generate_test_signal(self, duration=2.0, sample_rate=44100):
+        """Generate a test signal at 669Hz"""
+        t = np.linspace(0, duration, int(sample_rate * duration))
+        signal_669 = np.sin(2 * np.pi * self.base_freq * t)
+        return t, signal_669
+    
+    def plot_resonance_curve(self, save_path='resonance_curve_669.png'):
+        """Plot the resonance curve around 669Hz"""
+        plt.figure(figsize(12, 8))
+        
+        # Plot for different damping factors
+        damping_factors = self.config['calibration']['damping_factors']
+        colors = ['red', 'blue', 'green', 'orange']
+        
+        for damping, color in zip(damping_factors, colors):
+            frequencies, amplitudes = self.resonance_sweep(damping=damping)
+            resonance_freq, max_amp = self.find_resonance_peak(frequencies, amplitudes)
+            
+            plt.plot(frequencies, amplitudes, 
+                    label=f'Damping={damping}, Resonance={resonance_freq:.2f}Hz',
+                    color=color, linewidth=2)
+            
+            # Mark resonance point
+            plt.plot(resonance_freq, max_amp, 'o', color=color, markersize=8)
+        
+        plt.axvline(x=self.base_freq, color='black', linestyle='--', 
+                   label=f'Base Frequency ({self.base_freq}Hz)', alpha=0.7)
+        
+        plt.title('669 Tuning System - Resonance Curves\nSympathetic Vibration Analysis')
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Amplitude')
+        plt.grid(True, alpha=0.3)
+        plt.legend()
+        plt.ylim(0, 50)
+        
+        plt.tight_layout()
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.show()
+    
+    def tuning_report(self):
+        """Generate a comprehensive tuning report"""
+        print("\n" + "="*50)
+        print("🎻 669 TUNING SYSTEM REPORT")
+        print("="*50)
+        
+        # Harmonic series
+        harmonics = self.calculate_harmonics()
+        print("\n📈 HARMONIC SERIES:")
+        for name, freq in harmonics.items():
+            print(f"  {name}: {freq:.2f} Hz")
+        
+        # Resonance analysis
+        print(f"\n🎯 RESONANCE ANALYSIS:")
+        frequencies, amplitudes = self.resonance_sweep(damping=0.05)
+        resonance_freq, max_amp = self.find_resonance_peak(frequencies, amplitudes)
+        
+        print(f"  Peak Resonance: {resonance_freq:.2f} Hz")
+        print(f"  Max Amplitude: {max_amp:.2f}")
+        print(f"  Deviation from 669Hz: {abs(resonance_freq - self.base_freq):.2f} Hz")
+        
+        # Material resonance matches
+        materials = self.config['tuning_sets']['material_resonance']['materials']
+        print(f"\n🏗️  MATERIAL RESONANCE MATCHES:")
+        for material, freqs in materials.items():
+            matches = [f for f in freqs if abs(f - self.base_freq) <= 2.0]
+            if matches:
+                print(f"  {material}: {matches} Hz ✓")
+            else:
+                print(f"  {material}: No close matches ✗")
+
+# Demonstration
+if __name__ == "__main__":
+    # Initialize the tuning system
+    tuner = FrequencyTuner669()
+    
+    # Generate comprehensive report
+    tuner.tuning_report()
+    
+    # Plot resonance curves
+    tuner.plot_resonance_curve()
+    
+    # Test signal generation
+    t, test_signal = tuner.generate_test_signal(duration=0.1)
+    print(f"\n🔊 Generated test signal at 669Hz ({len(test_signal)} samples)")
+```
+
+3. Usage Example
+
+Create example_usage.py:
+
+```python
+from frequency_tuner_669 import FrequencyTuner669
+
+# Quick demonstration
+tuner = FrequencyTuner669()
+
+# Get specific tuning information
+harmonics = tuner.calculate_harmonics(6)
+print("Selected Harmonics:")
+for i, (name, freq) in enumerate(list(harmonics.items())[:4]):
+    print(f"  {name}: {freq:.1f} Hz")
+
+# Check resonance with different materials
+materials = tuner.config['tuning_sets']['material_resonance']['materials']
+print("\nMaterial Resonance Check:")
+for material, frequencies in materials.items():
+    closest = min(frequencies, key=lambda x: abs(x - 669.0))
+    diff = abs(closest - 669.0)
+    status = "✓ GOOD MATCH" if diff <= 1.0 else "○ DECENT MATCH" if diff <= 2.0 else "✗ POOR MATCH"
+    print(f"  {material}: {closest} Hz ({status})")
+```
+
+4. Repository Structure
+
+```
+/669-tuning-system/
+│
+├── README.md
+├── tuning_parameters_669.json
+├── frequency_tuner_669.py
+├── example_usage.py
+├── requirements.txt
+└── assets/
+    ├── resonance_curve_669.png
+    └── tuning_diagram.png
+```
+
+requirements.txt:
+
+```
+numpy
+matplotlib
+scipy
+```
+
+This implementation provides a complete system for working with 669Hz frequency tuning, resonance analysis, and sympathetic vibration experiments, perfectly extending the original cm669 concept.
