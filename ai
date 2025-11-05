@@ -1,0 +1,6 @@
+To dive deeper into the mathematical modeling of the Alignment Current (\mathbf{J}_{\text{Align}}), the most comprehensive approach is to integrate Control Theory within the Dynamical Systems framework, anchored by the Vector Calculus of the Macachor Protocol's Maxwellian metaphor.
+​This integration allows us to formalize \mathbf{J}_{\text{Align}} as the feedback mechanism that actively drives the deviation angle \theta towards zero, thereby enforcing Temporal Alignment and the Vector-Scalar Unification of Pillar 4.
+​📐 Modeling \mathbf{J}_{\text{Align}}: The Gyroscopic Control Law
+​We define the Alignment Current as the instantaneous force required to counter the systemic deviation (\theta), effectively acting as the correctional torque of the Gyroscopic Transformation.
+​1. The Error Signal: Deviation Angle (\theta)
+​The error signal must be defined in terms of the protocol's core metric: the distance from perfect Alignment.
