@@ -1,0 +1,95 @@
+import rasterio
+# Importing show from rasterio.plot allows for georeferenced axes
+from rasterio.plot import show as rasterio_show
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Define the file path. You MUST replace this placeholder with the actual path.
+INPUT_FILE = 'your_data_file.tif'
+
+print(f"--- Starting Geospatial Analysis for: {INPUT_FILE} ---")
+
+try:
+    # 1. LOAD THE DATA
+    with rasterio.open(INPUT_FILE) as src:
+        # Read the scalar values (band 1) into a 2D numpy array
+        data_array = src.read(1)
+        profile = src.profile # Save the metadata (CRS, transform, dtype, etc.)
+
+        # Print basic info
+        print(f"\n[INFO] Data Loaded Successfully.")
+        print(f"Dataset Shape (Rows, Cols): {data_array.shape}")
+        # The 'size' should match your expected 144,000 nodes if the file is correct.
+        print(f"Total Nodes: {data_array.size}")
+        print(f"Data Type: {data_array.dtype}")
+        print(f"CRS (Coordinate Reference System): {src.crs}")
+        print(f"Transform (Georeferencing): {src.transform}")
+
+        # 2. ANALYZE THE DATA
+        # Check for NoData values (NaNs and the official NoData value)
+        nodata_value = src.nodata
+        nodata_count = np.count_nonzero(data_array == nodata_value) if nodata_value is not None else 0
+        nan_count = np.count_nonzero(np.isnan(data_array))
+
+        print(f"\n[STATISTICS]")
+        if nan_count > 0 or nodata_count > 0:
+            print(f"Warning: Found {nan_count} NaN values and {nodata_count} NoData cells.")
+
+        # Calculate statistics, ignoring NaN values (robust for missing data)
+        min_val = np.nanmin(data_array)
+        max_val = np.nanmax(data_array)
+        mean_val = np.nanmean(data_array)
+        std_dev = np.nanstd(data_array)
+
+        print(f"Min Value: {min_val:.4f}")
+        print(f"Max Value: {max_val:.4f}")
+        print(f"Mean Value: {mean_val:.4f}")
+        print(f"Standard Deviation: {std_dev:.4f}")
+
+        # 3. VISUALIZE THE DATA (Using rasterio_show for georeferenced axes)
+        plt.figure(figsize=(12, 10))
+
+        # rasterio_show automatically uses the dataset's transform for axis scaling
+        im = rasterio_show(
+            data_array,
+            transform=src.transform,
+            # 'viridis' is a good default, but try 'terrain' or 'inferno' for different visual effects.
+            cmap='viridis',
+            title='Geospatial Scalar Field Visualization',
+            ax=plt.gca()
+        )
+
+        # Ensure the color bar matches the plotted image
+        plt.colorbar(im.get_children()[0], label='Scalar Value (e.g., meters, coherence level)')
+        plt.xlabel('Easting (X Coordinate)')
+        plt.ylabel('Northing (Y Coordinate)')
+        plt.show()
+
+        # 4. (Optional) EXPORT/SAVE PROCESSED DATA
+        # To save a map image:
+        # plt.savefig('my_geospatial_map.png', dpi=150, bbox_inches='tight')
+
+        # To save a processed GeoTIFF:
+        # processed_data = data_array # Your processing logic goes here
+        #
+        # output_profile = profile.copy()
+        # output_profile.update(
+        #     dtype=processed_data.dtype,
+        #     count=1,
+        #     compress='lzw' # Recommended compression
+        # )
+        #
+        # OUTPUT_FILE_PROCESSED = 'processed_scalar_field.tif'
+        # print(f"\n[EXPORT] Saving processed data to: {OUTPUT_FILE_PROCESSED}")
+        # with rasterio.open(OUTPUT_FILE_PROCESSED, 'w', **output_profile) as dst:
+        #     dst.write(processed_data, 1)
+
+
+except rasterio.RasterioIOError:
+    # Handle the error if the file path is incorrect or the file is corrupted
+    print(f"\n[ERROR] Could not open file: '{INPUT_FILE}'. Please ensure the file exists and is a valid GeoTIFF.")
+except Exception as e:
+    # Catch any other unexpected errors
+    print(f"\n[FATAL ERROR] An unexpected error occurred: {e}")
+
+print("\n--- Analysis Complete ---")
