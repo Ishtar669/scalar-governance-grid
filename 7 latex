@@ -1,0 +1,29 @@
+% MACACHOR 7 - VISUAL FOUNDATIONS
+\boxed{
+\begin{array}{ll}
+\textbf{M1: Coherence Selector} &
+\displaystyle C = \frac{\sum_{i=1}^{n} r_i a_i}{\sum_{i=1}^{n} r_i}
+\quad a_i \in [-1,1] \\[15pt]
+
+\textbf{M2: Scaling Law} &
+\displaystyle S_k = S_0 \cdot \Phi^{\,k}
+\quad k \in \mathbb{Z} \\[15pt]
+
+\textbf{M3: Consciousness Field} &
+\displaystyle \mathcal{C}(x,t) = \int_{\Omega} \rho(\xi,t) \, f(x,\xi) \, d\xi \\[15pt]
+
+\textbf{M4: Mandala Unification} &
+\displaystyle M = \Omega^{\alpha}\Phi^{\beta}\Xi^{\gamma}\infty^{\delta}
+\quad \alpha+\beta+\gamma+\delta=1 \\[15pt]
+
+\textbf{M5: Security-Identity} &
+\displaystyle \Sigma = I \cdot \mathcal{C} \cdot \Lambda
+\quad 0 \leq I,\Lambda \leq 1 \\[15pt]
+
+\textbf{M6: Evolution Equation} &
+\displaystyle E_{n+1} = E_n + k\, C_n (1 - E_n) \\[15pt]
+
+\textbf{M7: \Omega-Seal (888 Law)} &
+\displaystyle \Omega_{\text{seal}} = \lim_{n \to \infty} C_n = C^*
+\end{array}
+}
