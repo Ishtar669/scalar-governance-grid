@@ -1,0 +1,14 @@
+// In verification-script.js
+const GLYPH_444_CONSTANTS = {
+  TRIUNE_VECTOR: [1, 1, 1],        // Unit vector for validation
+  STABILITY_CONSTANT: 'OMEGA/3',   // Coherence ratio
+  ANCHOR_FORM: 'TRISKELION'        // Structural check type
+};
+
+function validateWithGlyph444(artifact) {
+  // Validation must pass in 3 identical phases (1-1-1)
+  const phase1 = validate(artifact);
+  const phase2 = validate(artifact); // Re-run, not cache
+  const phase3 = validate(artifact);
+  return (phase1 === phase2 && phase2 === phase3) ? 'STABLE' : 'UNSTABLE';
+}
