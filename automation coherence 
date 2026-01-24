@@ -1,0 +1,29 @@
+ΩPrimeEngine.automation = {
+  monitor() {
+    return EntropyScanner.detect({ threshold: "ν > Φ+0.01" });
+  },
+
+  interpret(signal) {
+    return PrincipleMatrix.mapToPrinciple({
+      signature: signal.type,
+      magnitude: signal.delta,
+      cyclePosition: signal.cycle
+    });
+  },
+
+  correct(signal, principle) {
+    return SovereignValidator.applyFrequency({
+      target: signal.id,
+      principle: principle,
+      intent: "Restore coherence to ν = Φ"
+    });
+  },
+
+  cycle() {
+    const signal = this.monitor();
+    if (!signal) return "Stable";
+
+    const principle = this.interpret(signal);
+    return this.correct(signal, principle);
+  }
+};
