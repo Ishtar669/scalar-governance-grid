@@ -1,0 +1,146 @@
+# macachor9.py
+# A grounded implementation of the Macachor-9 coherence framework
+
+from dataclasses import dataclass
+from typing import List, Dict, Callable, Optional, Tuple
+import numpy as np
+
+Array = np.ndarray
+
+
+@dataclass
+class Macachor9Config:
+    transition_tolerance: float = 0.05      # τ
+    epsilon_1: float = 0.01                 # review threshold
+    epsilon_2: float = 0.10                 # reject threshold
+    macachor_limit: float = 0.25            # M (hard limit)
+
+
+@dataclass
+class GovernanceDecision:
+    epsilon: float
+    response_code: int      # 0=accept, 1=review, 2=reject
+    lawful_transition: bool
+    within_limit: bool
+    notes: str
+
+
+class Macachor9:
+    """
+    Macachor-9: Coherence, continuity, and governance framework
+    for evolving artifacts represented as numeric vectors.
+    """
+
+    def __init__(self, config: Optional[Macachor9Config] = None):
+        self.config = config or Macachor9Config()
+
+    # 1. Coherence field
+    def coherence_field(self, states: List[Array]) -> Array:
+        """
+        Compute average normalized direction of subsystem states.
+        """
+        if not states:
+            return np.zeros(1)
+
+        normed = []
+        for x in states:
+            n = np.linalg.norm(x)
+            if n == 0:
+                continue
+            normed.append(x / n)
+
+        if not normed:
+            return np.zeros_like(states[0])
+
+        return np.mean(normed, axis=0)
+
+    # 2. Transition law
+    def transition_ratio(self, prev: Array, nxt: Array) -> float:
+        """
+        Compute relative change between previous and next state.
+        """
+        denom = np.linalg.norm(prev) + 1e-12
+        return float(np.linalg.norm(nxt - prev) / denom)
+
+    def is_lawful_transition(self, prev: Array, nxt: Array) -> bool:
+        t = self.transition_ratio(prev, nxt)
+        return t < self.config.transition_tolerance
+
+    # 3. Resonance (phase coherence)
+    def resonance(self, phases: Array) -> float:
+        """
+        phases: array of angles in radians
+        """
+        vec = np.exp(1j * phases)
+        return float(np.abs(np.sum(vec)))
+
+    # 4. Error magnitude
+    def error_magnitude(self, expected: Array, observed: Array) -> float:
+        return float(np.linalg.norm(expected - observed))
+
+    # 5. Governance response
+    def governance_response(self, epsilon: float) -> int:
+        """
+        0 = accept, 1 = review, 2 = reject
+        """
+        if epsilon < self.config.epsilon_1:
+            return 0
+        elif epsilon < self.config.epsilon_2:
+            return 1
+        else:
+            return 2
+
+    # 6. Full decision wrapper
+    def evaluate_transition(
+        self,
+        prev: Array,
+        nxt: Array,
+        expected: Optional[Array] = None
+    ) -> GovernanceDecision:
+        """
+        Evaluate a transition from prev -> nxt, optionally against an expected state.
+        """
+        # If no explicit expected state, treat nxt as expected for error=0 baseline
+        if expected is None:
+            expected = nxt
+
+        epsilon = self.error_magnitude(expected, nxt)
+        response = self.governance_response(epsilon)
+        lawful = self.is_lawful_transition(prev, nxt)
+        within_limit = epsilon < self.config.macachor_limit
+
+        notes = []
+        if not lawful:
+            notes.append("Transition exceeds tolerance.")
+        if not within_limit:
+            notes.append("Macachor-9 limit exceeded.")
+        if response == 1:
+            notes.append("Requires human review.")
+        elif response == 2:
+            notes.append("Reject or revert recommended.")
+
+        return GovernanceDecision(
+            epsilon=epsilon,
+            response_code=response,
+            lawful_transition=lawful,
+            within_limit=within_limit,
+            notes=" ".join(notes) if notes else "OK"
+        )
+
+
+if __name__ == "__main__":
+    # Example usage
+    m9 = Macachor9()
+
+    prev_state = np.array([1.0, 0.0, 0.0])
+    next_state = np.array([1.02, 0.01, -0.01])
+    expected_state = np.array([1.0, 0.0, 0.0])
+
+    decision = m9.evaluate_transition(prev_state, next_state, expected_state)
+
+    print("Macachor-9 decision:")
+    print(f"  epsilon:        {decision.epsilon:.6f}")
+    print(f"  response_code:  {decision.response_code} (0=accept,1=review,2=reject)")
+    print(f"  lawful:         {decision.lawful_transition}")
+    print(f"  within_limit:   {decision.within_limit}")
+    print(f"  notes:          {decision.notes}")
