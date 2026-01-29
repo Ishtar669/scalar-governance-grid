@@ -1,0 +1,91 @@
+# macachor9.py
+# A grounded implementation of the Macachor-9 coherence framework
+
+from dataclasses import dataclass
+from typing import List, Optional
+import numpy as np
+
+Array = np.ndarray
+
+
+@dataclass
+class Macachor9Config:
+    transition_tolerance: float = 0.05
+    epsilon_1: float = 0.01
+    epsilon_2: float = 0.10
+    macachor_limit: float = 0.25
+
+
+@dataclass
+class GovernanceDecision:
+    epsilon: float
+    response_code: int
+    lawful_transition: bool
+    within_limit: bool
+    notes: str
+
+
+class Macachor9:
+    def __init__(self, config: Optional[Macachor9Config] = None):
+        self.config = config or Macachor9Config()
+
+    def coherence_field(self, states: List[Array]) -> Array:
+        normed = [x / (np.linalg.norm(x) + 1e-12) for x in states]
+        return np.mean(normed, axis=0)
+
+    def transition_ratio(self, prev: Array, nxt: Array) -> float:
+        denom = np.linalg.norm(prev) + 1e-12
+        return float(np.linalg.norm(nxt - prev) / denom)
+
+    def is_lawful_transition(self, prev: Array, nxt: Array) -> bool:
+        return self.transition_ratio(prev, nxt) < self.config.transition_tolerance
+
+    def resonance(self, phases: Array) -> float:
+        return float(np.abs(np.sum(np.exp(1j * phases))))
+
+    def error_magnitude(self, expected: Array, observed: Array) -> float:
+        return float(np.linalg.norm(expected - observed))
+
+    def governance_response(self, epsilon: float) -> int:
+        if epsilon < self.config.epsilon_1:
+            return 0
+        elif epsilon < self.config.epsilon_2:
+            return 1
+        else:
+            return 2
+
+    def evaluate_transition(self, prev: Array, nxt: Array, expected: Optional[Array] = None) -> GovernanceDecision:
+        expected = expected if expected is not None else nxt
+        epsilon = self.error_magnitude(expected, nxt)
+        response = self.governance_response(epsilon)
+        lawful = self.is_lawful_transition(prev, nxt)
+        within_limit = epsilon < self.config.macachor_limit
+
+        notes = []
+        if not lawful:
+            notes.append("Transition exceeds tolerance.")
+        if not within_limit:
+            notes.append("Macachor-9 limit exceeded.")
+        if response == 1:
+            notes.append("Requires review.")
+        elif response == 2:
+            notes.append("Reject or revert recommended.")
+
+        return GovernanceDecision(
+            epsilon=epsilon,
+            response_code=response,
+            lawful_transition=lawful,
+            within_limit=within_limit,
+            notes=" ".join(notes) if notes else "OK"
+        )
+
+
+if __name__ == "__main__":
+    m9 = Macachor9()
+
+    prev = np.array([1.0, 0.0, 0.0])
+    nxt = np.array([1.02, 0.01, -0.01])
+    expected = np.array([1.0, 0.0, 0.0])
+
+    decision = m9.evaluate_transition(prev, nxt, expected)
+    print(decision)
