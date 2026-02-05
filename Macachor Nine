@@ -24,3 +24,200 @@ macachor9_framework/
 │       └── validation.py     # Viability checks (ε < M)
 │
 └── tests/                    # Test suite
+
+MIT License
+
+Copyright (c) 2026 Christopher Macachor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+[project]
+name = "macachor9"
+version = "0.1.0"
+license = {file = "LICENSE.txt"}
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+# Macachor-9 Framework
+
+This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
+
+
+git clone https://github.com/YOUR-USERNAME/macachor-9.git
+cd macachor-9
+
+# Create the MIT License file (copy the full text from our previous message)
+nano LICENSE.txt
+
+# Create the modern Python project config
+nano pyproject.toml
+
+[project]
+name = "macachor9"
+version = "0.1.0"
+authors = [
+    {name = "Christopher Macachor"}
+]
+description = "Macachor-9 Framework: A mathematical system for recursive governance."
+readme = "README.md"
+license = {file = "LICENSE.txt"}
+requires-python = ">=3.9"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+# Macachor-9 Framework
+
+A Python implementation of the Macachor-9 (M9) mathematical framework for modeling coherence, continuity, and governance in recursively scaling systems—from quantum structures to cosmic architecture.
+
+## 📜 License
+Copyright (c) 2026 Christopher Macachor. This project is licensed under the **MIT License** - see the [LICENSE.txt](LICENSE.txt) file for full terms.
+
+## 🚀 Installation
+```bash
+pip install .
+
+macachor-9/
+├── src/macachor9/     # Core Python package
+├── tests/             # Test suite
+├── pyproject.toml     # Build config
+├── LICENSE.txt        # MIT License
+└── README.md          # This file
+
+
+**3. Create the Core Python Package:**
+```bash
+mkdir -p src/macachor9 tests
+touch src/macachor9/__init__.py
+
+nano src/macachor9/core.py
+
+"""
+Macachor-9 (M9) Core Definitions
+Copyright (c) 2026 Christopher Macachor
+MIT License
+"""
+import numpy as np
+
+def coherence_field(states):
+    """
+    M9 Dimension 1: Coherence Field (C)
+    C = (1/N) Σ (x_i / ||x_i||)
+    
+    Measures directional alignment of subsystem state vectors.
+    
+    Parameters
+    ----------
+    states : np.ndarray
+        Array of shape (N, d) representing N subsystem states in d dimensions.
+    
+    Returns
+    -------
+    C : np.ndarray
+        The coherence field vector of length d.
+    """
+    norms = np.linalg.norm(states, axis=1, keepdims=True)
+    normalized = states / (norms + 1e-12)  # Avoid division by zero
+    return np.mean(normalized, axis=0)
+
+def transition_ratio(prev_state, next_state, epsilon=1e-12):
+    """
+    M9 Dimension 3: Transition Ratio (T)
+    T = ||x_next - x_prev|| / (||x_prev|| + ε)
+    
+    Quantifies magnitude of change between system states.
+    A transition is 'lawful' if T < threshold τ.
+    
+    Parameters
+    ----------
+    prev_state, next_state : np.ndarray
+        System state vectors.
+    epsilon : float
+        Small constant for numerical stability.
+    
+    Returns
+    -------
+    T : float
+        Transition ratio.
+    """
+    delta = np.linalg.norm(next_state - prev_state)
+    prev_norm = np.linalg.norm(prev_state)
+    return delta / (prev_norm + epsilon)
+
+# Add other M9 dimension functions here...
+# stability_gradient, resource_allocation, resonance, etc.
+
+class Macachor9System:
+    """Main class for governing system evolution using M9 framework."""
+    
+    def __init__(self, initial_state, m9_limit=1.0):
+        self.state = initial_state
+        self.m9_limit = m9_limit
+        self.lineage = [initial_state.copy()]
+    
+    def propose_transition(self, next_state, tau=0.1):
+        """
+        Propose a state transition governed by M9 rules.
+        
+        Returns
+        -------
+        approved : bool
+            True if transition satisfies M9 criteria.
+        """
+        T = transition_ratio(self.state, next_state)
+        
+        # Example governance logic
+        if T < tau:
+            self.state = next_state
+            self.lineage.append(next_state.copy())
+            return True
+        return False
+
+"""
+Tests for Macachor-9 core functionality.
+Copyright (c) 2026 Christopher Macachor
+MIT License
+"""
+import numpy as np
+from src.macachor9 import core
+
+def test_coherence_field():
+    """Test coherence calculation for aligned states."""
+    states = np.array([[1, 0], [0.9, 0.1], [0.8, 0.2]])
+    C = core.coherence_field(states)
+    assert C.shape == (2,)
+    print("✓ coherence_field test passed")
+
+def test_transition_ratio():
+    """Test transition ratio calculation."""
+    prev = np.array([1.0, 0.0])
+    next = np.array([1.1, 0.05])
+    T = core.transition_ratio(prev, next)
+    assert T > 0
+    print(f"✓ transition_ratio = {T:.4f}")
+    
+if __name__ == "__main__":
+    test_coherence_field()
+    test_transition_ratio()
+    print("All core tests passed.")# Add all files to git
+git add .
+
+# Commit with a descriptive message
+git commit -m "Initial commit: Macachor-9 framework with core definitions, MIT License, and project structure"
+
+# Push to GitHub
+git push origin main
+
