@@ -9,3 +9,18 @@ This software implements the Macachor-9 mathematical framework for modeling
 recursive scaling and governance in complex systems.
 Unauthorized copying, modification, distribution, or use is prohibited.
 """
+macachor9_framework/
+│
+├── LICENSE.txt               # The software license (e.g., MIT, Apache 2.0)
+├── pyproject.toml            # Modern Python project metadata
+├── README.md                 # Project overview and copyright notice
+│
+├── src/
+│   └── macachor9/            # Your main package
+│       ├── __init__.py       # Package init with copyright notice
+│       ├── core.py           # M9 dimension definitions (C, S, T, etc.)
+│       ├── scaling.py        # Universe scaling applications
+│       ├── governance.py     # G(ε) response logic
+│       └── validation.py     # Viability checks (ε < M)
+│
+└── tests/                    # Test suite
