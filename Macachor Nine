@@ -1,0 +1,11 @@
+"""
+Macachor-9 (M9) Framework
+A Python implementation of the recursive polyhedral governance system.
+
+Copyright (c) 2026 Christopher Macachor
+All rights reserved.
+
+This software implements the Macachor-9 mathematical framework for modeling
+recursive scaling and governance in complex systems.
+Unauthorized copying, modification, distribution, or use is prohibited.
+"""
