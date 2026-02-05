@@ -1,0 +1,372 @@
+# macachor9_enhanced.py
+from dataclasses import dataclass, asdict
+from typing import List, Dict, Callable, Optional, Tuple, Any
+import numpy as np
+from enum import IntEnum
+import json
+from datetime import datetime
+
+Array = np.ndarray
+
+
+class ResponseCode(IntEnum):
+    ACCEPT = 0
+    REVIEW = 1
+    REJECT = 2
+
+
+@dataclass
+class Macachor9Config:
+    transition_tolerance: float = 0.05      # τ
+    epsilon_1: float = 0.01                 # review threshold
+    epsilon_2: float = 0.10                 # reject threshold
+    macachor_limit: float = 0.25            # M (hard limit)
+    coherence_threshold: float = 0.7        # minimum coherence score
+    enable_resonance_check: bool = True
+    max_history_size: int = 100
+
+
+@dataclass
+class GovernanceDecision:
+    epsilon: float
+    response_code: ResponseCode      # 0=accept, 1=review, 2=reject
+    lawful_transition: bool
+    within_limit: bool
+    coherence_score: Optional[float] = None
+    resonance_score: Optional[float] = None
+    transition_ratio: Optional[float] = None
+    timestamp: str = ""
+    notes: str = ""
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert decision to dictionary for serialization."""
+        return {
+            'epsilon': self.epsilon,
+            'response_code': self.response_code.value,
+            'response_name': self.response_code.name,
+            'lawful_transition': self.lawful_transition,
+            'within_limit': self.within_limit,
+            'coherence_score': self.coherence_score,
+            'resonance_score': self.resonance_score,
+            'transition_ratio': self.transition_ratio,
+            'timestamp': self.timestamp,
+            'notes': self.notes
+        }
+
+
+class TransitionHistory:
+    """Track historical transitions for analysis."""
+    
+    def __init__(self, max_size: int = 100):
+        self.max_size = max_size
+        self.decisions: List[GovernanceDecision] = []
+    
+    def add(self, decision: GovernanceDecision):
+        """Add a decision to history."""
+        self.decisions.append(decision)
+        if len(self.decisions) > self.max_size:
+            self.decisions = self.decisions[-self.max_size:]
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get statistics from history."""
+        if not self.decisions:
+            return {}
+        
+        epsilons = [d.epsilon for d in self.decisions]
+        ratios = [d.transition_ratio for d in self.decisions if d.transition_ratio]
+        
+        return {
+            'total_transitions': len(self.decisions),
+            'accepted': sum(1 for d in self.decisions if d.response_code == ResponseCode.ACCEPT),
+            'reviewed': sum(1 for d in self.decisions if d.response_code == ResponseCode.REVIEW),
+            'rejected': sum(1 for d in self.decisions if d.response_code == ResponseCode.REJECT),
+            'avg_epsilon': np.mean(epsilons) if epsilons else 0,
+            'max_epsilon': max(epsilons) if epsilons else 0,
+            'unlawful_transitions': sum(1 for d in self.decisions if not d.lawful_transition)
+        }
+
+
+class Macachor9:
+    """
+    Macachor-9: Coherence, continuity, and governance framework
+    for evolving artifacts represented as numeric vectors.
+    """
+
+    def __init__(self, config: Optional[Macachor9Config] = None):
+        self.config = config or Macachor9Config()
+        self.history = TransitionHistory(self.config.max_history_size)
+        
+    # 1. Enhanced coherence field with weighted average
+    def coherence_field(self, states: List[Array], weights: Optional[List[float]] = None) -> Array:
+        """
+        Compute weighted average normalized direction of subsystem states.
+        """
+        if not states:
+            return np.zeros(1)
+        
+        if weights is None:
+            weights = [1.0] * len(states)
+        
+        normed_states = []
+        total_weight = 0
+        
+        for x, w in zip(states, weights):
+            n = np.linalg.norm(x)
+            if n == 0:
+                continue
+            normed_states.append((x / n) * w)
+            total_weight += w
+        
+        if not normed_states or total_weight == 0:
+            return np.zeros_like(states[0])
+        
+        return np.sum(normed_states, axis=0) / total_weight
+    
+    def coherence_score(self, states: List[Array]) -> float:
+        """
+        Calculate a coherence score between 0 and 1.
+        """
+        if len(states) < 2:
+            return 1.0
+        
+        cf = self.coherence_field(states)
+        cf_norm = np.linalg.norm(cf)
+        
+        # Normalize to [0, 1]
+        return float(cf_norm)
+    
+    # 2. Enhanced transition law with multiple metrics
+    def transition_ratio(self, prev: Array, nxt: Array) -> float:
+        """
+        Compute relative change between previous and next state.
+        """
+        denom = np.linalg.norm(prev) + 1e-12
+        return float(np.linalg.norm(nxt - prev) / denom)
+    
+    def is_lawful_transition(self, prev: Array, nxt: Array) -> bool:
+        t = self.transition_ratio(prev, nxt)
+        return t < self.config.transition_tolerance
+    
+    # 3. Enhanced resonance with normalization
+    def resonance(self, phases: Array) -> float:
+        """
+        phases: array of angles in radians
+        Returns normalized resonance between 0 and 1.
+        """
+        if len(phases) == 0:
+            return 0.0
+        
+        vec = np.exp(1j * phases)
+        raw_resonance = np.abs(np.sum(vec))
+        return float(raw_resonance / len(phases))
+    
+    # 4. Error magnitude with optional metrics
+    def error_magnitude(self, expected: Array, observed: Array, 
+                       metric: str = 'euclidean') -> float:
+        """
+        Compute error with different metrics.
+        """
+        if metric == 'euclidean':
+            return float(np.linalg.norm(expected - observed))
+        elif metric == 'cosine':
+            dot = np.dot(expected, observed)
+            norm_prod = np.linalg.norm(expected) * np.linalg.norm(observed) + 1e-12
+            return float(1 - dot / norm_prod)
+        elif metric == 'manhattan':
+            return float(np.sum(np.abs(expected - observed)))
+        else:
+            raise ValueError(f"Unknown metric: {metric}")
+    
+    # 5. Enhanced governance response
+    def governance_response(self, epsilon: float) -> ResponseCode:
+        """
+        0 = accept, 1 = review, 2 = reject
+        """
+        if epsilon < self.config.epsilon_1:
+            return ResponseCode.ACCEPT
+        elif epsilon < self.config.epsilon_2:
+            return ResponseCode.REVIEW
+        else:
+            return ResponseCode.REJECT
+    
+    # 6. Enhanced decision wrapper with history tracking
+    def evaluate_transition(
+        self,
+        prev: Array,
+        nxt: Array,
+        expected: Optional[Array] = None,
+        subsystem_states: Optional[List[Array]] = None,
+        phases: Optional[Array] = None
+    ) -> GovernanceDecision:
+        """
+        Evaluate a transition from prev -> nxt, optionally against an expected state.
+        """
+        # If no explicit expected state, treat nxt as expected for error=0 baseline
+        if expected is None:
+            expected = nxt
+        
+        epsilon = self.error_magnitude(expected, nxt)
+        response = self.governance_response(epsilon)
+        lawful = self.is_lawful_transition(prev, nxt)
+        within_limit = epsilon < self.config.macachor_limit
+        transition_ratio = self.transition_ratio(prev, nxt)
+        
+        # Calculate coherence if subsystem states provided
+        coherence_score = None
+        if subsystem_states:
+            coherence_score = self.coherence_score(subsystem_states)
+        
+        # Calculate resonance if phases provided
+        resonance_score = None
+        if phases is not None and self.config.enable_resonance_check:
+            resonance_score = self.resonance(phases)
+        
+        notes = []
+        if not lawful:
+            notes.append(f"Transition ratio {transition_ratio:.4f} exceeds tolerance {self.config.transition_tolerance}.")
+        if not within_limit:
+            notes.append(f"Error {epsilon:.4f} exceeds Macachor-9 limit {self.config.macachor_limit}.")
+        if coherence_score is not None and coherence_score < self.config.coherence_threshold:
+            notes.append(f"Coherence score {coherence_score:.4f} below threshold {self.config.coherence_threshold}.")
+        if response == ResponseCode.REVIEW:
+            notes.append("Requires human review.")
+        elif response == ResponseCode.REJECT:
+            notes.append("Reject or revert recommended.")
+        
+        decision = GovernanceDecision(
+            epsilon=epsilon,
+            response_code=response,
+            lawful_transition=lawful,
+            within_limit=within_limit,
+            coherence_score=coherence_score,
+            resonance_score=resonance_score,
+            transition_ratio=transition_ratio,
+            timestamp=datetime.now().isoformat(),
+            notes=" ".join(notes) if notes else "OK"
+        )
+        
+        # Add to history
+        self.history.add(decision)
+        
+        return decision
+    
+    def batch_evaluate(self, transitions: List[Tuple[Array, Array, Array]]) -> List[GovernanceDecision]:
+        """Evaluate multiple transitions."""
+        decisions = []
+        for prev, nxt, expected in transitions:
+            decision = self.evaluate_transition(prev, nxt, expected)
+            decisions.append(decision)
+        return decisions
+    
+    def export_history(self, filename: str):
+        """Export decision history to JSON file."""
+        history_data = {
+            'config': asdict(self.config),
+            'decisions': [d.to_dict() for d in self.history.decisions],
+            'stats': self.history.get_stats()
+        }
+        
+        with open(filename, 'w') as f:
+            json.dump(history_data, f, indent=2, default=str)
+    
+    def get_compliance_report(self) -> Dict[str, Any]:
+        """Generate a compliance report."""
+        stats = self.history.get_stats()
+        
+        return {
+            'total_decisions': stats.get('total_transitions', 0),
+            'compliance_rate': (stats.get('accepted', 0) / max(stats.get('total_transitions', 1), 1)) * 100,
+            'review_rate': (stats.get('reviewed', 0) / max(stats.get('total_transitions', 1), 1)) * 100,
+            'rejection_rate': (stats.get('rejected', 0) / max(stats.get('total_transitions', 1), 1)) * 100,
+            'unlawful_rate': (stats.get('unlawful_transitions', 0) / max(stats.get('total_transitions', 1), 1)) * 100,
+            'average_epsilon': stats.get('avg_epsilon', 0),
+            'max_epsilon': stats.get('max_epsilon', 0)
+        }
+
+
+# Example usage and demonstration
+def demonstrate_macachor9():
+    """Demonstrate the enhanced Macachor-9 framework."""
+    
+    print("=== Macachor-9 Framework Demonstration ===\n")
+    
+    # Initialize with custom configuration
+    config = Macachor9Config(
+        transition_tolerance=0.03,
+        epsilon_1=0.005,
+        epsilon_2=0.08,
+        macachor_limit=0.20
+    )
+    
+    m9 = Macachor9(config)
+    
+    # Example 1: Normal transition
+    print("Example 1: Normal Transition")
+    prev_state = np.array([1.0, 0.0, 0.0])
+    next_state = np.array([1.01, 0.002, -0.001])
+    expected_state = np.array([1.0, 0.0, 0.0])
+    
+    decision = m9.evaluate_transition(prev_state, next_state, expected_state)
+    print(f"  Response: {decision.response_code.name}")
+    print(f"  Epsilon: {decision.epsilon:.6f}")
+    print(f"  Lawful: {decision.lawful_transition}")
+    print(f"  Notes: {decision.notes}\n")
+    
+    # Example 2: Problematic transition
+    print("Example 2: Problematic Transition")
+    prev_state2 = np.array([1.0, 0.0, 0.0])
+    next_state2 = np.array([1.15, 0.1, -0.05])  # Large jump
+    expected_state2 = np.array([1.0, 0.0, 0.0])
+    
+    decision2 = m9.evaluate_transition(prev_state2, next_state2, expected_state2)
+    print(f"  Response: {decision2.response_code.name}")
+    print(f"  Epsilon: {decision2.epsilon:.6f}")
+    print(f"  Lawful: {decision2.lawful_transition}")
+    print(f"  Notes: {decision2.notes}\n")
+    
+    # Example 3: With subsystem coherence
+    print("Example 3: With Subsystem Coherence")
+    subsystem_states = [
+        np.array([0.9, 0.1, 0.0]),
+        np.array([1.1, -0.1, 0.0]),
+        np.array([1.0, 0.05, 0.01])
+    ]
+    
+    decision3 = m9.evaluate_transition(
+        prev_state, 
+        next_state, 
+        expected_state,
+        subsystem_states=subsystem_states
+    )
+    print(f"  Coherence Score: {decision3.coherence_score:.4f}")
+    print(f"  Response: {decision3.response_code.name}\n")
+    
+    # Example 4: With phase resonance
+    print("Example 4: With Phase Resonance")
+    phases = np.array([0.1, 0.12, 0.11, 0.105])  # Clustered phases
+    
+    decision4 = m9.evaluate_transition(
+        prev_state, 
+        next_state, 
+        expected_state,
+        phases=phases
+    )
+    print(f"  Resonance Score: {decision4.resonance_score:.4f}")
+    print(f"  Response: {decision4.response_code.name}\n")
+    
+    # Generate compliance report
+    report = m9.get_compliance_report()
+    print("=== Compliance Report ===")
+    for key, value in report.items():
+        if 'rate' in key:
+            print(f"  {key}: {value:.2f}%")
+        else:
+            print(f"  {key}: {value}")
+    
+    # Export history
+    m9.export_history("macachor9_history.json")
+    print("\nHistory exported to 'macachor9_history.json'")
+
+
+if __name__ == "__main__":
+    demonstrate_macachor9()
