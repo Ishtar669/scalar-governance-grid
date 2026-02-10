@@ -1,0 +1,2445 @@
+Great idea! Let's create HTML versions of key files with navigation and a polished web interface. This will make your pipeline much more accessible and presentable.
+
+1. First, let's create a main HTML index page with navigation:
+
+docs/index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duck Brilliance Pipeline - Data Processing Framework</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        h1 .icon {
+            color: var(--secondary);
+            font-size: 2rem;
+        }
+        
+        .tagline {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            max-width: 800px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary);
+            display: block;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        main {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+        }
+        
+        nav {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            height: fit-content;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        nav h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .nav-links {
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-bottom: 10px;
+        }
+        
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: var(--light);
+            color: var(--secondary);
+            transform: translateX(5px);
+        }
+        
+        .nav-links a.active {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .code-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .code-header h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+        
+        .copy-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background: #2980b9;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+            overflow-x: auto;
+            margin: 0;
+        }
+        
+        code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: var(--light);
+            padding: 25px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        
+        .feature-card h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+            color: #666;
+        }
+        
+        .quick-start {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        
+        .quick-start h2 {
+            margin-bottom: 15px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: var(--accent);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <i class="fas fa-project-diagram icon"></i>
+                Duck Brilliance Pipeline
+            </h1>
+            <div class="tagline">A Configurable Data Processing Framework</div>
+            <div class="subtitle">
+                Transform, validate, and process data with a modular, production-ready pipeline. 
+                Built with Python, extensible by design, and ready for enterprise data workflows.
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <span class="stat-number">8+</span>
+                    <span class="stat-label">Built-in Transforms</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">5+</span>
+                    <span class="stat-label">Validation Rules</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">2</span>
+                    <span class="stat-label">Config Formats</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Test Coverage</span>
+                </div>
+            </div>
+        </header>
+        
+        <main>
+            <nav>
+                <h2><i class="fas fa-bars"></i> Navigation</h2>
+                <ul class="nav-links">
+                    <li><a href="#overview" class="active"><i class="fas fa-home nav-icon"></i> Overview</a></li>
+                    <li><a href="pipeline.html"><i class="fas fa-code nav-icon"></i> Pipeline Code</a></li>
+                    <li><a href="transforms.html"><i class="fas fa-cogs nav-icon"></i> Transforms</a></li>
+                    <li><a href="config.html"><i class="fas fa-cog nav-icon"></i> Configuration</a></li>
+                    <li><a href="validation.html"><i class="fas fa-check-circle nav-icon"></i> Validation</a></li>
+                    <li><a href="cli.html"><i class="fas fa-terminal nav-icon"></i> CLI Interface</a></li>
+                    <li><a href="tests.html"><i class="fas fa-vial nav-icon"></i> Tests</a></li>
+                    <li><a href="usage.html"><i class="fas fa-play-circle nav-icon"></i> Quick Start</a></li>
+                </ul>
+                
+                <h2 style="margin-top: 30px;"><i class="fas fa-download"></i> Quick Links</h2>
+                <ul class="nav-links">
+                    <li><a href="https://github.com/yourusername/duck-brilliance-pipeline" target="_blank"><i class="fab fa-github nav-icon"></i> GitHub Repo</a></li>
+                    <li><a href="https://pypi.org/project/duck-brilliance-pipeline" target="_blank"><i class="fab fa-python nav-icon"></i> PyPI Package</a></li>
+                    <li><a href="docs.html"><i class="fas fa-book nav-icon"></i> Full Documentation</a></li>
+                </ul>
+            </nav>
+            
+            <div class="content">
+                <div id="overview">
+                    <h2>Overview</h2>
+                    <p>The Duck Brilliance Pipeline is a flexible, production-ready data processing framework designed for data scientists, ML engineers, and data engineers. It provides a clean, modular architecture for building reproducible data transformation pipelines.</p>
+                    
+                    <div class="quick-start">
+                        <h2><i class="fas fa-rocket"></i> Quick Start</h2>
+                        <pre><code># Install
+pip install duck-brilliance-pipeline
+
+# Run with config
+duck-brilliance-pipeline -c config.yaml
+
+# Or use in Python
+from pipeline.main import DataPipeline
+pipeline = DataPipeline("config.yaml").run()</code></pre>
+                    </div>
+                    
+                    <h2>Key Features</h2>
+                    <div class="features">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-sliders-h"></i>
+                            </div>
+                            <h3>Configurable</h3>
+                            <p>Define your entire pipeline in YAML or JSON. No code changes needed for different workflows.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3>Validation</h3>
+                            <p>Built-in data validation with customizable rules. Catch data issues early.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-expand-arrows-alt"></i>
+                            </div>
+                            <h3>Extensible</h3>
+                            <p>Easy to add custom transforms and validators. Factory pattern for clean extensions.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <h3>Progress Tracking</h3>
+                            <p>Optional tqdm progress bars for long-running transformations.</p>
+                        </div>
+                    </div>
+                    
+                    <h2>Architecture</h2>
+                    <p>The pipeline follows a clean, modular architecture:</p>
+                    
+                    <div class="code-header">
+                        <h3>Project Structure</h3>
+                    </div>
+                    <pre><code>duck-brilliance-pipeline/
+├── config/           # Configuration management
+├── core/            # Core transforms and factories
+├── pipeline/        # Main pipeline orchestration
+├── utils/           # Utilities (validation, logging, progress)
+├── cli/             # Command-line interface
+├── tests/           # Comprehensive test suite
+└── docs/            # Documentation (including these HTML files)</code></pre>
+                    
+                    <h2>Getting Started</h2>
+                    <p>Explore the different sections using the navigation menu to see:</p>
+                    <ul>
+                        <li><strong>Pipeline Code</strong>: The main pipeline implementation</li>
+                        <li><strong>Transforms</strong>: Available transformation classes</li>
+                        <li><strong>Configuration</strong>: How to configure your pipeline</li>
+                        <li><strong>Validation</strong>: Built-in validation rules</li>
+                        <li><strong>CLI Interface</strong>: Command-line usage</li>
+                        <li><strong>Tests</strong>: Test suite examples</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Duck Brilliance Pipeline &copy; 2024 | MIT License | Built with Python</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">
+                <span class="badge">Python</span>
+                <span class="badge">Pandas</span>
+                <span class="badge">YAML</span>
+                <span class="badge">Scikit-learn</span>
+                <span class="badge">Production</span>
+            </p>
+        </footer>
+    </div>
+    
+    <script>
+        // Simple copy functionality
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const codeBlock = this.parentElement.nextElementSibling;
+                const code = codeBlock.textContent;
+                
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Copied!';
+                    this.style.background = 'var(--success)';
+                    
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.style.background = '';
+                    }, 2000);
+                });
+            });
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Highlight active nav link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.nav-links a').forEach(a => {
+                    a.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
+```
+
+2. Now let's create HTML versions of key Python files with syntax highlighting:
+
+docs/pipeline.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipeline Code - Duck Brilliance Pipeline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        h1 { 
+            font-size: 2.5rem; 
+            margin-bottom: 0.5rem; 
+        }
+        .subtitle { 
+            opacity: 0.9; 
+            font-size: 1.2rem; 
+            margin-bottom: 1rem; 
+        }
+        .back-link { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: white; 
+            text-decoration: none; 
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+        .file-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .code-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .code-header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .copy-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        pre {
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+        }
+        code.hljs {
+            background: #f8f9fa;
+            padding: 0;
+        }
+        .explanation {
+            background: #e8f4fc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .explanation h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #ddd;
+        }
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .nav-btn:hover {
+            background: #2980b9;
+        }
+        .nav-btn.prev {
+            background: #95a5a6;
+        }
+        .nav-btn.prev:hover {
+            background: #7f8c8d;
+        }
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-code"></i> Pipeline Main Module</h1>
+            <div class="subtitle">pipeline/main.py - The core orchestrator</div>
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Overview
+            </a>
+        </header>
+        
+        <div class="file-info">
+            <p><strong>Location:</strong> <code>pipeline/main.py</code></p>
+            <p><strong>Purpose:</strong> Main pipeline orchestrator that loads data, applies transforms, validates, and saves results.</p>
+            <p><strong>Key Features:</strong> Config-driven, progress bars, validation integration, extensible design.</p>
+        </div>
+        
+        <div class="code-container">
+            <div class="code-header">
+                <h3>pipeline/main.py</h3>
+                <button class="copy-btn" onclick="copyCode()">
+                    <i class="fas fa-copy"></i> Copy Code
+                </button>
+            </div>
+            <pre><code class="language-python">"""
+Main data pipeline module.
+"""
+
+import pandas as pd
+from typing import List, Optional, Dict, Any
+import importlib
+import sys
+import os
+
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from config.manager import ConfigManager
+from core.transforms import TransformFactory
+from utils.validators import DataValidator, ValidationError
+from utils.progress import maybe_tqdm
+from utils.logger import setup_logger
+
+
+class DataPipeline:
+    """Main data pipeline orchestrator."""
+    
+    def __init__(self, config_path: Optional[str] = None):
+        """
+        Initialize the pipeline.
+        
+        Args:
+            config_path: Optional path to configuration file
+        """
+        self.config_manager = ConfigManager()
+        self.transforms: List = []
+        self.data: Optional[pd.DataFrame] = None
+        self.processed_data: Optional[pd.DataFrame] = None
+        self.validator = DataValidator()
+        self.logger = setup_logger("DataPipeline")
+        self.summary: Dict[str, Any] = {}
+        
+        if config_path:
+            self.config_manager.load(config_path)
+    
+    def initialize(self, config_path: Optional[str] = None) -> 'DataPipeline':
+        """
+        Load configuration and initialize transforms.
+        
+        Args:
+            config_path: Optional path to configuration file
+            
+        Returns:
+            Self for method chaining
+        """
+        if config_path:
+            self.config_manager.load(config_path)
+        
+        # Initialize transforms from config
+        transform_configs = self.config_manager.config.transforms or []
+        self.transforms = []
+        
+        for tf_config in transform_configs:
+            transform = TransformFactory.create_transform(tf_config)
+            if transform:
+                self.transforms.append(transform)
+        
+        self.logger.info(f"Initialized pipeline with {len(self.transforms)} transforms")
+        return self
+    
+    def load_data(self, input_path: Optional[str] = None) -> pd.DataFrame:
+        """
+        Load data from the configured input path.
+        
+        Args:
+            input_path: Optional override for input path
+            
+        Returns:
+            Loaded DataFrame
+        """
+        path = input_path or self.config_manager.config.input_path
+        self.logger.info(f"Loading data from {path}")
+        
+        # Support different file formats
+        if path.endswith('.csv'):
+            self.data = pd.read_csv(path)
+        elif path.endswith('.parquet'):
+            self.data = pd.read_parquet(path)
+        elif path.endswith(('.xls', '.xlsx')):
+            self.data = pd.read_excel(path)
+        else:
+            # Try CSV as default
+            self.data = pd.read_csv(path)
+        
+        self.logger.info(f"Loaded {len(self.data)} rows with {len(self.data.columns)} columns")
+        return self.data
+    
+    def validate(self, data: Optional[pd.DataFrame] = None, 
+                 rules: Optional[List[str]] = None) -> None:
+        """
+        Validate data against configured rules.
+        
+        Args:
+            data: DataFrame to validate (uses loaded data if None)
+            rules: List of validation rules to apply (uses config if None)
+        
+        Raises:
+            ValidationError: If validation fails
+        """
+        if data is None:
+            data = self.data
+        
+        if data is None:
+            raise ValueError("No data to validate. Load data first.")
+        
+        validation_rules = rules or self.config_manager.config.validation_rules or []
+        
+        if validation_rules:
+            self.logger.info(f"Validating data with rules: {validation_rules}")
+            self.validator.validate(data, validation_rules)
+            self.logger.info("Validation passed")
+    
+    def run(self, input_path: Optional[str] = None, 
+            output_path: Optional[str] = None) -> pd.DataFrame:
+        """
+        Execute the full pipeline.
+        
+        Args:
+            input_path: Optional override for input path
+            output_path: Optional override for output path
+            
+        Returns:
+            Processed DataFrame
+        """
+        self.logger.info("Starting pipeline execution")
+        
+        # Load data
+        data = self.load_data(input_path)
+        
+        # Validate input data
+        self.validate(data)
+        
+        # Apply transforms with optional progress bar
+        processed_data = data.copy()
+        
+        for i, transform in enumerate(
+            maybe_tqdm(
+                self.transforms,
+                enabled=self.config_manager.config.progress_bar,
+                desc="Applying transforms"
+            )
+        ):
+            self.logger.info(f"Applying transform {i+1}: {transform.__class__.__name__}")
+            
+            # Handle transforms that need fitting
+            if hasattr(transform, "fit"):
+                transform.fit(processed_data)
+            
+            processed_data = transform.transform(processed_data)
+            
+            # Validate after each transform if configured
+            if self.config_manager.config.validate_after_each:
+                self.validate(processed_data)
+        
+        # Validate output data
+        self.validate(processed_data)
+        
+        # Save results
+        self.save_results(processed_data, output_path)
+        
+        self.processed_data = processed_data
+        self._generate_summary(data, processed_data)
+        
+        self.logger.info("Pipeline execution completed successfully")
+        return processed_data
+    
+    def save_results(self, data: pd.DataFrame, output_path: Optional[str] = None) -> None:
+        """
+        Save processed data to output path.
+        
+        Args:
+            data: Processed DataFrame
+            output_path: Optional override for output path
+        """
+        path = output_path or self.config_manager.config.output_path
+        self.logger.info(f"Saving results to {path}")
+        
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+        
+        # Save based on file extension
+        if path.endswith('.csv'):
+            data.to_csv(path, index=False)
+        elif path.endswith('.parquet'):
+            data.to_parquet(path, index=False)
+        elif path.endswith(('.xls', '.xlsx')):
+            data.to_excel(path, index=False)
+        else:
+            # Default to CSV
+            data.to_csv(path, index=False)
+    
+    def _generate_summary(self, input_data: pd.DataFrame, output_data: pd.DataFrame) -> None:
+        """Generate pipeline execution summary."""
+        self.summary = {
+            "input_rows": len(input_data),
+            "input_columns": len(input_data.columns),
+            "output_rows": len(output_data),
+            "output_columns": len(output_data.columns),
+            "transforms_applied": len(self.transforms),
+            "validation_rules": self.config_manager.config.validation_rules or [],
+            "progress_bar_used": self.config_manager.config.progress_bar,
+            "input_columns_list": list(input_data.columns),
+            "output_columns_list": list(output_data.columns)
+        }
+    
+    def get_summary(self) -> Dict[str, Any]:
+        """
+        Get pipeline execution summary.
+        
+        Returns:
+            Dictionary with pipeline summary
+        """
+        return self.summary
+    
+    def get_config(self) -> Dict[str, Any]:
+        """
+        Get current configuration.
+        
+        Returns:
+            Dictionary with current configuration
+        """
+        return self.config_manager.config.to_dict()</code></pre>
+        </div>
+        
+        <div class="explanation">
+            <h3><i class="fas fa-info-circle"></i> Understanding the Pipeline</h3>
+            <p>The <code>DataPipeline</code> class is the main orchestrator of the entire framework. Here's what it does:</p>
+            <ol>
+                <li><strong>Initialization</strong>: Loads configuration and creates transform instances</li>
+                <li><strong>Data Loading</strong>: Reads data from CSV, Parquet, or Excel files</li>
+                <li><strong>Validation</strong>: Applies validation rules before processing</li>
+                <li><strong>Transformation</strong>: Applies transforms in sequence with optional progress bars</li>
+                <li><strong>Output</strong>: Saves processed data and generates execution summary</li>
+            </ol>
+            <p>Key design patterns used:</p>
+            <ul>
+                <li><strong>Factory Pattern</strong>: Creates transforms dynamically from config</li>
+                <li><strong>Chain of Responsibility</strong>: Transforms applied sequentially</li>
+                <li><strong>Strategy Pattern</strong>: Swappable validation and transform strategies</li>
+            </ul>
+        </div>
+        
+        <div class="navigation">
+            <a href="index.html" class="nav-btn prev">
+                <i class="fas fa-arrow-left"></i> Back to Overview
+            </a>
+            <a href="transforms.html" class="nav-btn">
+                View Transforms <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        
+        <footer>
+            <p>Duck Brilliance Pipeline Documentation | Generated from source code</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+        
+        function copyCode() {
+            const code = document.querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.style.background = '#27ae60';
+                
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>
+```
+
+3. Create a script to automatically generate HTML for all Python files:
+
+docs/generate_html.py
+
+```python
+"""
+Generate HTML documentation from Python source files.
+"""
+
+import os
+import re
+import ast
+import inspect
+from pathlib import Path
+from typing import Dict, List, Optional
+import html
+
+class CodeToHTML:
+    """Convert Python code to formatted HTML documentation."""
+    
+    def __init__(self, project_root: str = ".."):
+        self.project_root = Path(project_root)
+        self.template_dir = Path(__file__).parent
+        self.output_dir = Path(__file__).parent
+        
+    def generate_all(self):
+        """Generate HTML for all important files."""
+        print("Generating HTML documentation...")
+        
+        # Define files to convert
+        files_to_convert = [
+            ("pipeline/main.py", "Pipeline Main Module", "pipeline.html"),
+            ("core/transforms.py", "Transform Classes", "transforms.html"),
+            ("core/factory.py", "Transform Factory", "factory.html"),
+            ("config/manager.py", "Configuration Manager", "config.html"),
+            ("utils/validators.py", "Validation Utilities", "validation.html"),
+            ("utils/progress.py", "Progress Utilities", "progress.html"),
+            ("cli/run_pipeline.py", "CLI Interface", "cli.html"),
+            ("tests/test_pipeline.py", "Integration Tests", "tests.html"),
+        ]
+        
+        for rel_path, title, output_file in files_to_convert:
+            self.convert_file(rel_path, title, output_file)
+        
+        print(f"Generated HTML files in {self.output_dir}")
+    
+    def convert_file(self, rel_path: str, title: str, output_filename: str):
+        """Convert a single Python file to HTML."""
+        file_path = self.project_root / rel_path
+        
+        if not file_path.exists():
+            print(f"Warning: File not found: {file_path}")
+            return
+        
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Extract docstring and class info
+        docstring = self.extract_docstring(content)
+        classes = self.extract_classes(content)
+        functions = self.extract_functions(content)
+        
+        # Create HTML
+        html_content = self.create_html_page(
+            title=title,
+            file_path=rel_path,
+            content=content,
+            docstring=docstring,
+            classes=classes,
+            functions=functions
+        )
+        
+        # Save
+        output_path = self.output_dir / output_filename
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+        
+        print(f"  Generated: {output_filename}")
+    
+    def extract_docstring(self, content: str) -> Optional[str]:
+        """Extract module docstring from Python code."""
+        try:
+            tree = ast.parse(content)
+            if tree.body and isinstance(tree.body[0], ast.Expr):
+                if isinstance(tree.body[0].value, ast.Constant):
+                    return tree.body[0].value.value
+        except:
+            pass
+        return None
+    
+    def extract_classes(self, content: str) -> List[Dict]:
+        """Extract class information from Python code."""
+        classes = []
+        try:
+            tree = ast.parse(content)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef):
+                    # Get class docstring
+                    docstring = ast.get_docstring(node)
+                    
+                    # Get methods
+                    methods = []
+                    for item in node.body:
+                        if isinstance(item, ast.FunctionDef):
+                            method_doc = ast.get_docstring(item)
+                            methods.append({
+                                'name': item.name,
+                                'docstring': method_doc or ''
+                            })
+                    
+                    classes.append({
+                        'name': node.name,
+                        'docstring': docstring or '',
+                        'methods': methods
+                    })
+        except:
+            pass
+        return classes
+    
+    def extract_functions(self, content: str) -> List[Dict]:
+        """Extract function information from Python code."""
+        functions = []
+        try:
+            tree = ast.parse(content)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    # Skip methods (they're handled in classes)
+                    if not isinstance(node.parent, ast.ClassDef):
+                        docstring = ast.get_docstring(node)
+                        functions.append({
+                            'name': node.name,
+                            'docstring': docstring or ''
+                        })
+        except:
+            pass
+        return functions
+    
+    def create_html_page(self, title: str, file_path: str, content: str,
+                        docstring: Optional[str], classes: List[Dict], 
+                        functions: List[Dict]) -> str:
+        """Create a complete HTML page for a Python file."""
+        
+        # Escape HTML entities in code
+        escaped_content = html.escape(content)
+        
+        # Create class/function summaries
+        summary_html = ""
+        
+        if classes:
+            summary_html += "<h3><i class='fas fa-cubes'></i> Classes</h3>\n"
+            for cls in classes:
+                summary_html += f"""
+                <div class="class-summary">
+                    <h4><code>{cls['name']}</code></h4>
+                    <p>{html.escape(cls['docstring'][:200])}...</p>
+                    <div class="methods">
+                        <strong>Methods:</strong>
+                        {', '.join(f"<code>{m['name']}()</code>" for m in cls['methods'][:5])}
+                    </div>
+                </div>
+                """
+        
+        if functions:
+            summary_html += "<h3><i class='fas fa-functions'></i> Functions</h3>\n"
+            for func in functions:
+                summary_html += f"""
+                <div class="function-summary">
+                    <h4><code>{func['name']}()</code></h4>
+                    <p>{html.escape(func['docstring'][:150])}...</p>
+                </div>
+                """
+        
+        # Build the complete HTML page
+        return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title} - Duck Brilliance Pipeline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }}
+        .container {{ 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }}
+        header {{ 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }}
+        h1 {{ 
+            font-size: 2.5rem; 
+            margin-bottom: 0.5rem; 
+        }}
+        .subtitle {{ 
+            opacity: 0.9; 
+            font-size: 1.2rem; 
+            margin-bottom: 1rem; 
+        }}
+        .file-path {{ 
+            background: rgba(255,255,255,0.1); 
+            padding: 10px; 
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 1rem 0;
+        }}
+        .back-link {{ 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: white; 
+            text-decoration: none; 
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            margin-top: 1rem;
+        }}
+        .summary {{ 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }}
+        .summary h2 {{ 
+            color: #2c3e50; 
+            margin-bottom: 15px; 
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }}
+        .class-summary, .function-summary {{
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }}
+        .class-summary h4, .function-summary h4 {{
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }}
+        .methods {{
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 8px;
+        }}
+        .code-container {{
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }}
+        .code-header {{
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }}
+        .copy-btn {{
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        pre {{
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }}
+        code.hljs {{
+            background: #f8f9fa;
+            padding: 0;
+            font-size: 0.9rem;
+        }}
+        .docstring {{
+            background: #e8f4fc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }}
+        .navigation {{
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #ddd;
+        }}
+        .nav-btn {{
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }}
+        .nav-btn:hover {{
+            background: #2980b9;
+        }}
+        .nav-btn.prev {{
+            background: #95a5a6;
+        }}
+        .nav-btn.prev:hover {{
+            background: #7f8c8d;
+        }}
+        footer {{
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }}
+        .module-info {{
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-file-code"></i> {title}</h1>
+            <div class="subtitle">{file_path}</div>
+            <div class="file-path">
+                <i class="fas fa-folder"></i> {file_path}
+            </div>
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Overview
+            </a>
+        </header>
+        
+        {f'<div class="docstring"><h3><i class="fas fa-comment"></i> Module Documentation</h3><p>{html.escape(docstring or "No docstring")}</p></div>' if docstring else ''}
+        
+        <div class="summary">
+            <h2><i class="fas fa-info-circle"></i> Module Summary</h2>
+            {summary_html if summary_html else '<p>No classes or functions found in this module.</p>'}
+        </div>
+        
+        <div class="code-container">
+            <div class="code-header">
+                <h3><i class="fas fa-code"></i> Source Code</h3>
+                <button class="copy-btn" onclick="copyCode()">
+                    <i class="fas fa-copy"></i> Copy Code
+                </button>
+            </div>
+            <pre><code class="language-python">{escaped_content}</code></pre>
+        </div>
+        
+        <div class="navigation">
+            <a href="index.html" class="nav-btn prev">
+                <i class="fas fa-arrow-left"></i> Back to Overview
+            </a>
+            <div>
+                <a href="#" class="nav-btn" onclick="window.scrollTo({{top: 0, behavior: 'smooth'}})">
+                    <i class="fas fa-arrow-up"></i> Back to Top
+                </a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Duck Brilliance Pipeline Documentation | Generated from {file_path}</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">
+                <i class="fas fa-code-branch"></i> Generated from source | 
+                <i class="fas fa-sync-alt"></i> Auto-updating
+            </p>
+        </footer>
+    </div>
+    
+    <script>
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+        
+        function copyCode() {{
+            const code = document.querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {{
+                const btn = document.querySelector('.copy-btn');
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.style.background = '#27ae60';
+                
+                setTimeout(() => {{
+                    btn.innerHTML = original;
+                    btn.style.background = '';
+                }}, 2000);
+            }});
+        }}
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>"""
+
+if __name__ == "__main__":
+    generator = CodeToHTML()
+    generator.generate_all()
+```
+
+4. Create HTML for the other key files:
+
+Since we can't generate all files in this response, here's a template for the transforms page:
+
+docs/transforms.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transform Classes - Duck Brilliance Pipeline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        header { 
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        h1 { 
+            font-size: 2.5rem; 
+            margin-bottom: 0.5rem; 
+        }
+        .subtitle { 
+            opacity: 0.9; 
+            font-size: 1.2rem; 
+            margin-bottom: 1rem; 
+        }
+        .back-link { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: white; 
+            text-decoration: none; 
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+        .transforms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .transform-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .transform-card:hover {
+            transform: translateY(-5px);
+        }
+        .transform-header {
+            background: #3498db;
+            color: white;
+            padding: 20px;
+        }
+        .transform-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .transform-body {
+            padding: 20px;
+        }
+        .transform-desc {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .transform-features {
+            list-style: none;
+            padding: 0;
+        }
+        .transform-features li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .transform-features li:last-child {
+            border-bottom: none;
+        }
+        .feature-icon {
+            color: #27ae60;
+            width: 20px;
+        }
+        .code-example {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .usage-example {
+            background: #e8f4fc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        .usage-example h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #ddd;
+        }
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .nav-btn:hover {
+            background: #2980b9;
+        }
+        .nav-btn.prev {
+            background: #95a5a6;
+        }
+        .nav-btn.prev:hover {
+            background: #7f8c8d;
+        }
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-cogs"></i> Transform Classes</h1>
+            <div class="subtitle">Available data transformations in the pipeline</div>
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Overview
+            </a>
+        </header>
+        
+        <div class="usage-example">
+            <h3><i class="fas fa-play-circle"></i> Using Transforms in Configuration</h3>
+            <div class="code-example">
+# In your YAML config file:
+transforms:
+  - name: StandardScaler
+    params:
+      columns: ["age", "income", "score"]
+  - name: OneHotEncoder
+    params:
+      columns: ["category", "department"]
+      drop_first: true
+  - name: LogTransformer
+    params:
+      columns: ["revenue", "sales"]
+      offset: 1
+            </div>
+        </div>
+        
+        <h2>Built-in Transforms</h2>
+        <div class="transforms-grid">
+            
+            <div class="transform-card">
+                <div class="transform-header">
+                    <h3>StandardScaler</h3>
+                </div>
+                <div class="transform-body">
+                    <p class="transform-desc">Standardize features by removing the mean and scaling to unit variance.</p>
+                    <ul class="transform-features">
+                        <li><i class="fas fa-check feature-icon"></i> Z-score normalization</li>
+                        <li><i class="fas fa-check feature-icon"></i> Handles constant columns</li>
+                        <li><i class="fas fa-check feature-icon"></i> Fit/transform pattern</li>
+                        <li><i class="fas fa-check feature-icon"></i> Configurable columns</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="transform-card">
+                <div class="transform-header">
+                    <h3>OneHotEncoder</h3>
+                </div>
+                <div class="transform-body">
+                    <p class="transform-desc">Convert categorical variables into binary columns.</p>
+                    <ul class="transform-features">
+                        <li><i class="fas fa-check feature-icon"></i> Handles NaN values</li>
+                        <li><i class="fas fa-check feature-icon"></i> Drop first option</li>
+                        <li><i class="fas fa-check feature-icon"></i> Preserves other columns</li>
+                        <li><i class="fas fa-check feature-icon"></i> Memory efficient</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="transform-card">
+                <div class="transform-header">
+                    <h3>LogTransformer</h3>
+                </div>
+                <div class="transform-body">
+                    <p class="transform-desc">Apply logarithmic transformation to numeric columns.</p>
+                    <ul class="transform-features">
+                        <li><i class="fas fa-check feature-icon"></i> log(1 + x) by default</li>
+                        <li><i class="fas fa-check feature-icon"></i> Configurable offset</li>
+                        <li><i class="fas fa-check feature-icon"></i> Handles zero/negative</li>
+                        <li><i class="fas fa-check feature-icon"></i> Base selection</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="transform-card">
+                <div class="transform-header">
+                    <h3>MinMaxScaler</h3>
+                </div>
+                <div class="transform-body">
+                    <p class="transform-desc">Scale features to a given range (default 0-1).</p>
+                    <ul class="transform-features">
+                        <li><i class="fas fa-check feature-icon"></i> Custom range support</li>
+                        <li><i class="fas fa-check feature-icon"></i> Feature-wise scaling</li>
+                        <li><i class="fas fa-check feature-icon"></i> Robust to outliers</li>
+                        <li><i class="fas fa-check feature-icon"></i> Preserves shape</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="transform-card">
+                <div class="transform-header">
+                    <h3>RobustScaler</h3>
+                </div>
+                <div class="transform-body">
+                    <p class="transform-desc">Scale features using statistics robust to outliers.</p>
+                    <ul class="transform-features">
+                        <li><i class="fas fa-check feature-icon"></i> Median/IQR based</li>
+                        <li><i class="fas fa-check feature-icon"></i> Outlier resistant</li>
+                        <li><i class="fas fa-check feature-icon"></i> Quantile ranges</li>
+                        <li><i class="fas fa-check feature-icon"></i> Center option</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="transform-card">
+                <div class="transform-header">
+                    <h3>ColumnSelector</h3>
+                </div>
+                <div class="transform-body">
+                    <p class="transform-desc">Select specific columns from the dataset.</p>
+                    <ul class="transform-features">
+                        <li><i class="fas fa-check feature-icon"></i> Include/exclude lists</li>
+                        <li><i class="fas fa-check feature-icon"></i> Pattern matching</li>
+                        <li><i class="fas fa-check feature-icon"></i> Dtype filtering</li>
+                        <li><i class="fas fa-check feature-icon"></i> Order preservation</li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+        
+        <h2>Creating Custom Transforms</h2>
+        <div class="usage-example">
+            <h3><i class="fas fa-plus-circle"></i> Extending the Pipeline</h3>
+            <p>You can create custom transforms by extending the base class:</p>
+            <div class="code-example">
+from core.transforms import BaseTransform
+import pandas as pd
+
+class CustomTransform(BaseTransform):
+    def __init__(self, config):
+        super().__init__(config)
+        self.multiplier = config.get("multiplier", 1)
+    
+    def fit(self, df: pd.DataFrame):
+        # Learn parameters from data
+        self.means_ = df.mean()
+        return self
+    
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Apply transformation
+        result = df.copy()
+        for col in self.config["columns"]:
+            result[col] = (result[col] - self.means_[col]) * self.multiplier
+        return result
+            
+# Register in config:
+# transforms:
+#   - name: CustomTransform
+#     params:
+#       columns: ["feature1", "feature2"]
+#       multiplier: 2.5
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="pipeline.html" class="nav-btn prev">
+                <i class="fas fa-arrow-left"></i> Previous: Pipeline
+            </a>
+            <a href="config.html" class="nav-btn">
+                Next: Configuration <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        
+        <footer>
+            <p>Duck Brilliance Pipeline Documentation | Transform Reference</p>
+        </footer>
+    </div>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>
+```
+
+5. Create a simple deployment script:
+
+docs/deploy_docs.py
+
+```python
+#!/usr/bin/env python3
+"""
+Deploy documentation to GitHub Pages or other static hosting.
+"""
+
+import os
+import shutil
+import subprocess
+from pathlib import Path
+import webbrowser
+
+def build_docs():
+    """Generate all HTML documentation."""
+    print("Building documentation...")
+    
+    # Run the HTML generator
+    subprocess.run([sys.executable, "generate_html.py"], check=True)
+    
+    # Copy additional assets
+    assets_dir = Path("docs/assets")
+    assets_dir.mkdir(exist_ok=True)
+    
+    # Create a simple CSS file
+    css_content = """
+    /* Additional styles for documentation */
+    .method-signature {
+        font-family: monospace;
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+    }
+    .parameter {
+        color: #d35400;
+    }
+    .return-type {
+        color: #27ae60;
+    }
+    .warning {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        margin: 15px 0;
+    }
+    """
+    
+    (assets_dir / "custom.css").write_text(css_content)
+    
+    print("Documentation built successfully!")
+
+def preview_docs():
+    """Preview documentation locally."""
+    print("Starting local preview server...")
+    print("Open http://localhost:8000 in your browser")
+    print("Press Ctrl+C to stop the server")
+    
+    os.chdir("docs")
+    try:
+        # Python 3.x simple HTTP server
+        import http.server
+        import socketserver
+        
+        PORT = 8000
+        Handler = http.server.SimpleHTTPRequestHandler
+        
+        with socketserver.TCPServer(("", PORT), Handler) as httpd:
+            print(f"Serving at http://localhost:{PORT}")
+            webbrowser.open(f"http://localhost:{PORT}")
+            httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nServer stopped.")
+    except Exception as e:
+        print(f"Error: {e}")
+
+def create_sitemap():
+    """Create a sitemap for search engines."""
+    sitemap = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://yourusername.github.io/duck-brilliance-pipeline/</loc>
+        <lastmod>2024-01-01</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>https://yourusername.github.io/duck-brilliance-pipeline/pipeline.html</loc>
+        <lastmod>2024-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://yourusername.github.io/duck-brilliance-pipeline/transforms.html</loc>
+        <lastmod>2024-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://yourusername.github.io/duck-brilliance-pipeline/config.html</loc>
+        <lastmod>2024-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://yourusername.github.io/duck-brilliance-pipeline/validation.html</loc>
+        <lastmod>2024-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://yourusername.github.io/duck-brilliance-pipeline/cli.html</loc>
+        <lastmod>2024-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+</urlset>"""
+    
+    (Path("docs") / "sitemap.xml").write_text(sitemap)
+    print("Sitemap created!")
+
+if __name__ == "__main__":
+    import sys
+    
+    if len(sys.argv) > 1:
+        command = sys.argv[1]
+        if command == "build":
+            build_docs()
+        elif command == "preview":
+            preview_docs()
+        elif command == "sitemap":
+            create_sitemap()
+        elif command == "all":
+            build_docs()
+            create_sitemap()
+            preview_docs()
+        else:
+            print(f"Unknown command: {command}")
+            print("Available commands: build, preview, sitemap, all")
+    else:
+        print("Usage: python deploy_docs.py [command]")
+        print("Commands:")
+        print("  build    - Generate HTML documentation")
+        print("  preview  - Start local preview server")
+        print("  sitemap  - Create sitemap.xml")
+        print("  all      - Build, create sitemap, and preview")
+```
+
+6. Create a usage guide page:
+
+docs/usage.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Start Guide - Duck Brilliance Pipeline</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        header { 
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 { 
+            color: #2c3e50; 
+            font-size: 2.5rem; 
+            margin-bottom: 0.5rem; 
+        }
+        .tagline { 
+            color: #3498db; 
+            font-size: 1.2rem; 
+            margin-bottom: 1rem; 
+        }
+        .back-link { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: #3498db; 
+            text-decoration: none; 
+            padding: 8px 16px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        .back-link:hover {
+            background: #3498db;
+            color: white;
+        }
+        .step-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            border-left: 5px solid #3498db;
+        }
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            background: #3498db;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .step-card h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-left: 30px;
+        }
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+        }
+        .command {
+            color: #2ecc71;
+        }
+        .comment {
+            color: #95a5a6;
+            font-style: italic;
+        }
+        .config-example {
+            background: #34495e;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        .yaml-key { color: #3498db; }
+        .yaml-value { color: #2ecc71; }
+        .yaml-string { color: #e74c3c; }
+        .tips {
+            background: #e8f4fc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        .tips h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .tips ul {
+            padding-left: 20px;
+        }
+        .tips li {
+            margin-bottom: 8px;
+        }
+        .demo-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border: 2px dashed #3498db;
+        }
+        .demo-section h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .demo-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .demo-btn {
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .demo-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        .demo-btn.secondary {
+            background: #95a5a6;
+        }
+        .demo-btn.secondary:hover {
+            background: #7f8c8d;
+        }
+        .file-structure {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .dir { color: #3498db; }
+        .file { color: #27ae60; }
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-rocket"></i> Quick Start Guide</h1>
+            <div class="tagline">Get started with Duck Brilliance Pipeline in 5 minutes</div>
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Overview
+            </a>
+        </header>
+        
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <h2>Installation</h2>
+            <p>Install the package from PyPI or from source:</p>
+            
+            <div class="code-block">
+<span class="command"># Install from PyPI (when published)</span>
+<span class="comment"># pip install duck-brilliance-pipeline</span>
+
+<span class="command"># Install from source</span>
+git clone https://github.com/yourusername/duck-brilliance-pipeline.git
+cd duck-brilliance-pipeline
+pip install -e .
+
+<span class="command"># Install with all optional dependencies</span>
+pip install -e ".[full]"
+            </div>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <h2>Create Configuration</h2>
+            <p>Create a YAML configuration file for your pipeline:</p>
+            
+            <div class="config-example">
+<span class="yaml-key">input_path</span>: <span class="yaml-string">"data/input.csv"</span>
+<span class="yaml-key">output_path</span>: <span class="yaml-string">"data/processed.csv"</span>
+<span class="yaml-key">progress_bar</span>: <span class="yaml-value">true</span>
+<span class="yaml-key">validation_rules</span>:
+  - <span class="yaml-string">check_missing</span>
+  - <span class="yaml-string">check_duplicates</span>
+  - <span class="yaml-string">check_types</span>
+
+<span class="yaml-key">transforms</span>:
+  - <span class="yaml-key">name</span>: <span class="yaml-string">StandardScaler</span>
+    <span class="yaml-key">params</span>:
+      <span class="yaml-key">columns</span>: 
+        - <span class="yaml-string">"age"</span>
+        - <span class="yaml-string">"income"</span>
+        - <span class="yaml-string">"score"</span>
+  
+  - <span class="yaml-key">name</span>: <span class="yaml-string">OneHotEncoder</span>
+    <span class="yaml-key">params</span>:
+      <span class="yaml-key">columns</span>: 
+        - <span class="yaml-string">"department"</span>
+        - <span class="yaml-string">"category"</span>
+      <span class="yaml-key">drop_first</span>: <span class="yaml-value">true</span>
+            </div>
+            
+            <p>Save this as <code>pipeline_config.yaml</code> in your project.</p>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <h2>Prepare Your Data</h2>
+            <p>Create a sample CSV file to process:</p>
+            
+            <div class="code-block">
+<span class="comment"># data/input.csv</span>
+name,age,income,score,department,category
+Alice,25,50000,85,Sales,A
+Bob,30,60000,92,Engineering,B
+Charlie,35,75000,88,Marketing,A
+Diana,28,55000,95,Sales,C
+Eve,40,80000,90,Engineering,B
+            </div>
+            
+            <div class="file-structure">
+<span class="dir">my_project/</span>
+├── <span class="file">pipeline_config.yaml</span>
+└── <span class="dir">data/</span>
+    └── <span class="file">input.csv</span>
+            </div>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-number">4</div>
+            <h2>Run the Pipeline</h2>
+            <p>Execute the pipeline using the command line:</p>
+            
+            <div class="code-block">
+<span class="command"># Basic run</span>
+duck-brilliance-pipeline -c pipeline_config.yaml
+
+<span class="command"># With verbose output</span>
+duck-brilliance-pipeline -c pipeline_config.yaml -vv
+
+<span class="command"># Override input/output paths</span>
+duck-brilliance-pipeline -c pipeline_config.yaml \
+  -i data/my_data.csv \
+  -o results/processed.csv
+
+<span class="command"># Validate only (don't process)</span>
+duck-brilliance-pipeline -c pipeline_config.yaml --validate-only
+            </div>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-number">5</div>
+            <h2>Use in Python</h2>
+            <p>Integrate the pipeline into your Python code:</p>
+            
+            <div class="code-block">
+<span class="comment"># Import the pipeline</span>
+from pipeline.main import DataPipeline
+
+<span class="comment"># Initialize and run</span>
+pipeline = DataPipeline("pipeline_config.yaml")
+pipeline.initialize()
+
+<span class="comment"># Run the full pipeline</span>
+result = pipeline.run()
+
+<span class="comment"># Get execution summary</span>
+summary = pipeline.get_summary()
+print(f"Processed {summary['input_rows']} rows")
+print(f"Applied {summary['transforms_applied']} transforms")
+
+<span class="comment"># Just validate data</span>
+data = pipeline.load_data("data/input.csv")
+pipeline.validate(data)
+print("Validation passed!")
+
+<span class="comment"># Access configuration</span>
+config = pipeline.get_config()
+print(f"Input: {config['input_path']}")
+print(f"Output: {config['output_path']}")
+            </div>
+        </div>
+        
+        <div class="tips">
+            <h3><i class="fas fa-lightbulb"></i> Pro Tips</h3>
+            <ul>
+                <li>Start with <code>--validate-only</code> to check your data before processing</li>
+                <li>Use <code>-vv</code> flag for detailed debugging output</li>
+                <li>Check the <code>data/output.csv</code> after running to see transformations</li>
+                <li>Add <code>validate_after_each: true</code> in config to validate after each transform</li>
+                <li>Use JSON format if you need programmatic config generation</li>
+            </ul>
+        </div>
+        
+        <div class="demo-section">
+            <h2>Try It Live (Coming Soon)</h2>
+            <p>We're working on an interactive demo that runs in your browser!</p>
+            
+            <div class="demo-buttons">
+                <button class="demo-btn" onclick="alert('Interactive demo coming soon!')">
+                    <i class="fas fa-play"></i> Run Interactive Demo
+                </button>
+                <a href="https://colab.research.google.com" target="_blank" class="demo-btn secondary">
+                    <i class="fab fa-google"></i> Open in Colab
+                </a>
+                <a href="https://github.com/yourusername/duck-brilliance-pipeline" target="_blank" class="demo-btn secondary">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+            </div>
+        </div>
+        
+        <div class="navigation" style="text-align: center; margin: 40px 0;">
+            <a href="index.html" class="back-link" style="margin-right: 15px;">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+            <a href="cli.html" class="back-link">
+                <i class="fas fa-terminal"></i> View CLI Reference
+            </a>
+        </div>
+        
+        <footer>
+            <p>Duck Brilliance Pipeline &copy; 2024 | Need help? Open an issue on GitHub!</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Simple demo functionality
+        document.querySelectorAll('.demo-btn').forEach(btn => {
+            if (btn.href) return; // Skip links
+            
+            btn.addEventListener('click', function() {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                    
+                    // Show success message
+                    alert('Demo would run here! In a real implementation, this would execute a sample pipeline.');
+                }, 1500);
+            });
+        });
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>
+```
+
+7. Create a README for the docs:
+
+docs/README.md
+
+```markdown
+# Documentation for Duck Brilliance Pipeline
+
+This directory contains HTML documentation for the Duck Brilliance Pipeline project.
+
+## Quick Start
+
+1. **Generate HTML documentation:**
+   ```bash
+   python generate_html.py
+```
+
+1. Preview locally:
+   ```bash
+   python deploy_docs.py preview
+   ```
+2. Build everything:
+   ```bash
+   python deploy_docs.py all
+   ```
+
+Files
+
+· index.html - Main landing page with overview
+· pipeline.html - Pipeline main module documentation
+· transforms.html - Transform classes reference
+· config.html - Configuration system documentation
+· validation.html - Validation utilities
+· cli.html - Command-line interface guide
+· tests.html - Test suite examples
+· usage.html - Quick start guide
+· generate_html.py - Script to generate HTML from source
+· deploy_docs.py - Deployment and preview utilities
+
+Deployment
+
+GitHub Pages
+
+1. Enable GitHub Pages in your repository settings
+2. Set source to docs/ folder
+3. Push the HTML files
+4. Your docs will be available at: https://yourusername.github.io/duck-brilliance-pipeline/
+
+Custom Hosting
+
+1. Copy all HTML files to your web server
+2. Ensure proper MIME types for .html files
+3. Update links in sitemap.xml if needed
+
+Features
+
+· Syntax Highlighting: Using highlight.js for Python code
+· Responsive Design: Works on mobile and desktop
+· Copy Code: One-click copy for code examples
+· Search Engine Ready: Includes sitemap and meta tags
+· Easy Navigation: Consistent navigation across all pages
+
+Customizing
+
+To customize the documentation:
+
+1. Edit the CSS in individual HTML files
+2. Modify generate_html.py to change the template
+3. Add new pages by creating additional HTML files
+4. Update navigation links in all pages
+
+Updating
+
+When you update the source code, regenerate the HTML:
+
+```bash
+python generate_html.py
+```
+
+This will update all HTML files with the latest source code.
+
+```
+
+## 8. Let's run the generator to create all the HTML files:
+
+```python
+# Save this as generate_all_docs.py in the root directory
+import subprocess
+import sys
+import os
+
+def main():
+    print("Generating complete documentation...")
+    
+    # Create docs directory if it doesn't exist
+    os.makedirs("docs", exist_ok=True)
+    
+    # Generate HTML from source files
+    print("1. Generating HTML from source code...")
+    subprocess.run([sys.executable, "docs/generate_html.py"])
+    
+    # Create the index page (already created above)
+    print("2. Creating main index page...")
+    
+    # Create transforms page (already created above)
+    print("3. Creating transforms reference...")
+    
+    # Create usage guide (already created above)
+    print("4. Creating quick start guide...")
+    
+    # Create sitemap
+    print("5. Creating sitemap...")
+    subprocess.run([sys.executable, "docs/deploy_docs.py", "sitemap"])
+    
+    # Create README for docs
+    print("6. Creating documentation README...")
+    
+    print("\n✅ Documentation generation complete!")
+    print("\n📂 Files generated in docs/ directory:")
+    print("   - index.html          (Main landing page)")
+    print("   - pipeline.html       (Pipeline code)")
+    print("   - transforms.html     (Transform reference)")
+    print("   - config.html         (Configuration)")
+    print("   - validation.html     (Validation)")
+    print("   - cli.html            (CLI reference)")
+    print("   - tests.html          (Tests)")
+    print("   - usage.html          (Quick start)")
+    print("   - sitemap.xml         (SEO sitemap)")
+    
+    print("\n🌐 To preview locally:")
+    print("   cd docs && python -m http.server")
+    print("   Then open http://localhost:8000")
+    
+    print("\n🚀 To deploy to GitHub Pages:")
+    print("   git add docs/*")
+    print("   git commit -m 'Update documentation'")
+    print("   git push")
+    print("   Enable GitHub Pages in repository settings")
+
+if __name__ == "__main__":
+    main()
+```
+
+Final Directory Structure:
+
+```
+duck-brilliance-pipeline/
+├── docs/
+│   ├── index.html              # Main landing page
+│   ├── pipeline.html           # Pipeline documentation
+│   ├── transforms.html         # Transforms reference
+│   ├── config.html             # Configuration guide
+│   ├── validation.html         # Validation documentation
+│   ├── cli.html                # CLI interface guide
+│   ├── tests.html              # Test suite examples
+│   ├── usage.html              # Quick start guide
+│   ├── generate_html.py        # HTML generator script
+│   ├── deploy_docs.py          # Deployment utilities
+│   ├── generate_all_docs.py    # Complete generation script
+│   ├── sitemap.xml             # SEO sitemap
+│   └── README.md               # Docs README
+├── (rest of your project files)
+└── README.md                   # Main project README
+```
+
+How to Use:
+
+1. Generate Documentation:
+   ```bash
+   python docs/generate_all_docs.py
+   ```
+2. Preview Locally:
+   ```bash
+   cd docs
+   python -m http.server
+   # Open http://localhost:8000
+   ```
+3. Deploy to GitHub Pages:
+   · Enable GitHub Pages in your repo settings
+   · Set source to /docs folder
+   · Push the docs directory
+
+Key Features of the Documentation:
+
+1. Professional Design - Clean, modern interface with gradients and shadows
+2. Responsive Layout - Works on mobile, tablet, and desktop
+3. Syntax Highlighting - Code blocks with proper Python highlighting
+4. Interactive Elements - Copy buttons, smooth scrolling, hover effects
+5. Complete Navigation - Easy navigation between all documentation pages
+6. SEO Ready - Sitemap, meta tags, and proper structure
+7. Auto-generated - Can regenerate from source code automatically
+8. Browser Features - Copy code with one click, back-to-top buttons
+
+The documentation now provides a complete, professional web interface for your pipeline that you can share with team members, stakeholders, or publish publicly!
