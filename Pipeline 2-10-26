@@ -1,0 +1,1397 @@
+Excellent plan! Let's implement all these pieces together. I'll create the missing files and update existing ones with a clean, integrated approach.
+
+1. First, let's create the progress utility:
+
+utils/progress.py
+
+```python
+"""
+Progress bar utilities with tqdm integration.
+"""
+
+from typing import Iterable, Any, Optional
+import sys
+
+# Check if tqdm is available
+try:
+    from tqdm import tqdm
+    _TQDM_AVAILABLE = True
+except ImportError:
+    _TQDM_AVAILABLE = False
+
+
+def maybe_tqdm(iterable: Iterable[Any], enabled: bool, desc: str = "", 
+               total: Optional[int] = None) -> Iterable[Any]:
+    """
+    Wrap an iterable with tqdm if enabled and tqdm is available.
+    
+    Args:
+        iterable: Iterable to wrap
+        enabled: Whether to show progress bar
+        desc: Description for progress bar
+        total: Total number of items (if not inferable from iterable)
+        
+    Returns:
+        Iterable wrapped with tqdm if enabled, otherwise original iterable
+    """
+    if not enabled or not _TQDM_AVAILABLE:
+        return iterable
+    
+    try:
+        return tqdm(iterable, desc=desc, total=total, leave=False, 
+                   file=sys.stdout, dynamic_ncols=True)
+    except Exception:
+        # If tqdm fails for any reason, fall back to no progress bar
+        return iterable
+
+
+def tqdm_available() -> bool:
+    """Check if tqdm is available."""
+    return _TQDM_AVAILABLE
+```
+
+2. Create the validation utilities:
+
+utils/validators.py
+
+```python
+"""
+Data validation utilities.
+"""
+
+import pandas as pd
+import numpy as np
+from typing import List, Dict, Any, Optional
+
+
+class ValidationError(RuntimeError):
+    """Raised when data fails validation."""
+    pass
+
+
+class DataValidator:
+    """Simple rule-based validator for dataframes."""
+    
+    def __init__(self):
+        self._custom_rules: Dict[str, callable] = {}
+    
+    def validate(self, df: pd.DataFrame, rules: List[str]) -> None:
+        """
+        Run all requested rules; raise ValidationError on failure.
+        
+        Args:
+            df: DataFrame to validate
+            rules: List of rule names to apply
+            
+        Raises:
+            ValidationError: If any validation rule fails
+        """
+        errors = []
+        
+        for rule in rules:
+            method = getattr(self, f"_check_{rule}", None)
+            if method is None:
+                # Check custom rules
+                if rule in self._custom_rules:
+                    result = self._custom_rules[rule](df)
+                    if result:
+                        errors.append(result)
+                else:
+                    raise ValueError(f"Unknown validation rule: {rule}")
+            else:
+                rule_errors = method(df)
+                if rule_errors:
+                    errors.extend(rule_errors)
+        
+        if errors:
+            error_msg = "Data validation failed:\n" + "\n".join(f"  - {e}" for e in errors)
+            raise ValidationError(error_msg)
+    
+    def add_custom_rule(self, name: str, check_function: callable) -> None:
+        """
+        Add a custom validation rule.
+        
+        Args:
+            name: Name of the rule (will be called as check_{name})
+            check_function: Function that takes a DataFrame and returns error message(s) or None
+        """
+        self._custom_rules[name] = check_function
+    
+    # ---- Built-in rule implementations ----
+    
+    def _check_check_missing(self, df: pd.DataFrame) -> List[str]:
+        """Check for missing values in the dataframe."""
+        errors = []
+        missing = df.isnull().sum()
+        missing_cols = missing[missing > 0]
+        
+        for col, count in missing_cols.items():
+            percentage = (count / len(df)) * 100
+            errors.append(f"Column '{col}': {count} missing values ({percentage:.1f}%)")
+        
+        return errors
+    
+    def _check_check_types(self, df: pd.DataFrame) -> List[str]:
+        """
+        Check column types against expected patterns.
+        By default, checks numeric columns starting with 'num_' or ending with '_score'
+        """
+        errors = []
+        
+        # Define type expectations
+        numeric_prefixes = ['num_', 'score_', 'value_']
+        numeric_suffixes = ['_score', '_value', '_pct', '_rate', '_ratio']
+        
+        for col in df.columns:
+            col_lower = col.lower()
+            
+            # Check if column should be numeric
+            should_be_numeric = (
+                any(col_lower.startswith(prefix) for prefix in numeric_prefixes) or
+                any(col_lower.endswith(suffix) for suffix in numeric_suffixes)
+            )
+            
+            if should_be_numeric and not pd.api.types.is_numeric_dtype(df[col]):
+                errors.append(f"Column '{col}': Expected numeric type, got {df[col].dtype}")
+        
+        return errors
+    
+    def _check_check_range(self, df: pd.DataFrame) -> List[str]:
+        """Check for values outside expected ranges."""
+        errors = []
+        
+        # Percentage columns (0-1 or 0-100)
+        for col in df.columns:
+            col_lower = col.lower()
+            if '_pct' in col_lower or col_lower.endswith('_percentage'):
+                if pd.api.types.is_numeric_dtype(df[col]):
+                    if (df[col] < 0).any() or (df[col] > 100).any():
+                        errors.append(f"Column '{col}': Values outside [0, 100] range")
+            
+            # Boolean-like columns (0/1)
+            elif col_lower.endswith('_flag') or col_lower.startswith('is_'):
+                if pd.api.types.is_numeric_dtype(df[col]):
+                    unique_vals = df[col].dropna().unique()
+                    if not all(val in [0, 1] for val in unique_vals):
+                        errors.append(f"Column '{col}': Expected 0/1 values, found {unique_vals}")
+        
+        return errors
+    
+    def _check_check_duplicates(self, df: pd.DataFrame) -> List[str]:
+        """Check for duplicate rows."""
+        errors = []
+        
+        dup_count = df.duplicated().sum()
+        if dup_count > 0:
+            errors.append(f"Found {dup_count} duplicate row(s)")
+        
+        return errors
+    
+    def _check_check_negative(self, df: pd.DataFrame) -> List[str]:
+        """Check for unexpected negative values."""
+        errors = []
+        
+        # Columns that should not have negative values
+        positive_indicators = ['count_', 'total_', 'amount_', 'quantity_', '_count']
+        
+        for col in df.columns:
+            col_lower = col.lower()
+            if (any(indicator in col_lower for indicator in positive_indicators) and 
+                pd.api.types.is_numeric_dtype(df[col])):
+                
+                negative_count = (df[col] < 0).sum()
+                if negative_count > 0:
+                    errors.append(f"Column '{col}': {negative_count} negative values")
+        
+        return errors
+```
+
+3. Update the pipeline to use these utilities:
+
+pipeline/main.py (updated version)
+
+```python
+"""
+Main data pipeline module.
+"""
+
+import pandas as pd
+from typing import List, Optional, Dict, Any
+import importlib
+import sys
+import os
+
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from config.manager import ConfigManager
+from core.transforms import TransformFactory
+from utils.validators import DataValidator, ValidationError
+from utils.progress import maybe_tqdm
+from utils.logger import setup_logger
+
+
+class DataPipeline:
+    """Main data pipeline orchestrator."""
+    
+    def __init__(self, config_path: Optional[str] = None):
+        """
+        Initialize the pipeline.
+        
+        Args:
+            config_path: Optional path to configuration file
+        """
+        self.config_manager = ConfigManager()
+        self.transforms: List = []
+        self.data: Optional[pd.DataFrame] = None
+        self.processed_data: Optional[pd.DataFrame] = None
+        self.validator = DataValidator()
+        self.logger = setup_logger("DataPipeline")
+        self.summary: Dict[str, Any] = {}
+        
+        if config_path:
+            self.config_manager.load(config_path)
+    
+    def initialize(self, config_path: Optional[str] = None) -> 'DataPipeline':
+        """
+        Load configuration and initialize transforms.
+        
+        Args:
+            config_path: Optional path to configuration file
+            
+        Returns:
+            Self for method chaining
+        """
+        if config_path:
+            self.config_manager.load(config_path)
+        
+        # Initialize transforms from config
+        transform_configs = self.config_manager.config.transforms or []
+        self.transforms = []
+        
+        for tf_config in transform_configs:
+            transform = TransformFactory.create_transform(tf_config)
+            if transform:
+                self.transforms.append(transform)
+        
+        self.logger.info(f"Initialized pipeline with {len(self.transforms)} transforms")
+        return self
+    
+    def load_data(self, input_path: Optional[str] = None) -> pd.DataFrame:
+        """
+        Load data from the configured input path.
+        
+        Args:
+            input_path: Optional override for input path
+            
+        Returns:
+            Loaded DataFrame
+        """
+        path = input_path or self.config_manager.config.input_path
+        self.logger.info(f"Loading data from {path}")
+        
+        # Support different file formats
+        if path.endswith('.csv'):
+            self.data = pd.read_csv(path)
+        elif path.endswith('.parquet'):
+            self.data = pd.read_parquet(path)
+        elif path.endswith(('.xls', '.xlsx')):
+            self.data = pd.read_excel(path)
+        else:
+            # Try CSV as default
+            self.data = pd.read_csv(path)
+        
+        self.logger.info(f"Loaded {len(self.data)} rows with {len(self.data.columns)} columns")
+        return self.data
+    
+    def validate(self, data: Optional[pd.DataFrame] = None, 
+                 rules: Optional[List[str]] = None) -> None:
+        """
+        Validate data against configured rules.
+        
+        Args:
+            data: DataFrame to validate (uses loaded data if None)
+            rules: List of validation rules to apply (uses config if None)
+        
+        Raises:
+            ValidationError: If validation fails
+        """
+        if data is None:
+            data = self.data
+        
+        if data is None:
+            raise ValueError("No data to validate. Load data first.")
+        
+        validation_rules = rules or self.config_manager.config.validation_rules or []
+        
+        if validation_rules:
+            self.logger.info(f"Validating data with rules: {validation_rules}")
+            self.validator.validate(data, validation_rules)
+            self.logger.info("Validation passed")
+    
+    def run(self, input_path: Optional[str] = None, 
+            output_path: Optional[str] = None) -> pd.DataFrame:
+        """
+        Execute the full pipeline.
+        
+        Args:
+            input_path: Optional override for input path
+            output_path: Optional override for output path
+            
+        Returns:
+            Processed DataFrame
+        """
+        self.logger.info("Starting pipeline execution")
+        
+        # Load data
+        data = self.load_data(input_path)
+        
+        # Validate input data
+        self.validate(data)
+        
+        # Apply transforms with optional progress bar
+        processed_data = data.copy()
+        
+        for i, transform in enumerate(
+            maybe_tqdm(
+                self.transforms,
+                enabled=self.config_manager.config.progress_bar,
+                desc="Applying transforms"
+            )
+        ):
+            self.logger.info(f"Applying transform {i+1}: {transform.__class__.__name__}")
+            
+            # Handle transforms that need fitting
+            if hasattr(transform, "fit"):
+                transform.fit(processed_data)
+            
+            processed_data = transform.transform(processed_data)
+            
+            # Validate after each transform if configured
+            if self.config_manager.config.validate_after_each:
+                self.validate(processed_data)
+        
+        # Validate output data
+        self.validate(processed_data)
+        
+        # Save results
+        self.save_results(processed_data, output_path)
+        
+        self.processed_data = processed_data
+        self._generate_summary(data, processed_data)
+        
+        self.logger.info("Pipeline execution completed successfully")
+        return processed_data
+    
+    def save_results(self, data: pd.DataFrame, output_path: Optional[str] = None) -> None:
+        """
+        Save processed data to output path.
+        
+        Args:
+            data: Processed DataFrame
+            output_path: Optional override for output path
+        """
+        path = output_path or self.config_manager.config.output_path
+        self.logger.info(f"Saving results to {path}")
+        
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+        
+        # Save based on file extension
+        if path.endswith('.csv'):
+            data.to_csv(path, index=False)
+        elif path.endswith('.parquet'):
+            data.to_parquet(path, index=False)
+        elif path.endswith(('.xls', '.xlsx')):
+            data.to_excel(path, index=False)
+        else:
+            # Default to CSV
+            data.to_csv(path, index=False)
+    
+    def _generate_summary(self, input_data: pd.DataFrame, output_data: pd.DataFrame) -> None:
+        """Generate pipeline execution summary."""
+        self.summary = {
+            "input_rows": len(input_data),
+            "input_columns": len(input_data.columns),
+            "output_rows": len(output_data),
+            "output_columns": len(output_data.columns),
+            "transforms_applied": len(self.transforms),
+            "validation_rules": self.config_manager.config.validation_rules or [],
+            "progress_bar_used": self.config_manager.config.progress_bar,
+            "input_columns_list": list(input_data.columns),
+            "output_columns_list": list(output_data.columns)
+        }
+    
+    def get_summary(self) -> Dict[str, Any]:
+        """
+        Get pipeline execution summary.
+        
+        Returns:
+            Dictionary with pipeline summary
+        """
+        return self.summary
+    
+    def get_config(self) -> Dict[str, Any]:
+        """
+        Get current configuration.
+        
+        Returns:
+            Dictionary with current configuration
+        """
+        return self.config_manager.config.to_dict()
+```
+
+4. Create unit tests:
+
+tests/test_transforms.py
+
+```python
+"""
+Tests for transform classes.
+"""
+
+import pandas as pd
+import numpy as np
+import pytest
+from core.transforms import StandardScaler, OneHotEncoder, LogTransformer
+
+
+def test_standard_scaler():
+    """Test StandardScaler transform."""
+    df = pd.DataFrame({
+        "a": [1, 2, 3, 4, 5],
+        "b": [10, 20, 30, 40, 50],
+        "c": ["x", "y", "x", "y", "x"]  # Non-numeric column
+    })
+    
+    scaler = StandardScaler({"columns": ["a", "b"]})
+    
+    # Test fit
+    scaler.fit(df)
+    assert hasattr(scaler, 'means_')
+    assert hasattr(scaler, 'stds_')
+    assert "a" in scaler.means_
+    assert "b" in scaler.means_
+    
+    # Test transform
+    transformed = scaler.transform(df)
+    
+    # Check scaled columns have mean ~0 and std ~1
+    assert np.allclose(transformed["a"].mean(), 0, atol=1e-7)
+    assert np.allclose(transformed["b"].mean(), 0, atol=1e-7)
+    assert np.allclose(transformed["a"].std(), 1, atol=1e-7)
+    assert np.allclose(transformed["b"].std(), 1, atol=1e-7)
+    
+    # Check non-scaled columns unchanged
+    assert (transformed["c"] == df["c"]).all()
+
+
+def test_standard_scaler_single_value():
+    """Test StandardScaler with single value (std=0)."""
+    df = pd.DataFrame({"a": [5, 5, 5, 5]})
+    
+    scaler = StandardScaler({"columns": ["a"]})
+    scaler.fit(df)
+    transformed = scaler.transform(df)
+    
+    # Should handle constant column gracefully (scale to 0)
+    assert (transformed["a"] == 0).all()
+
+
+def test_one_hot_encoder():
+    """Test OneHotEncoder transform."""
+    df = pd.DataFrame({
+        "category": ["A", "B", "A", "C", "B"],
+        "value": [1, 2, 3, 4, 5]
+    })
+    
+    encoder = OneHotEncoder({"columns": ["category"]})
+    encoder.fit(df)
+    transformed = encoder.transform(df)
+    
+    # Check new columns created
+    assert "category_A" in transformed.columns
+    assert "category_B" in transformed.columns
+    assert "category_C" in transformed.columns
+    
+    # Check encoding
+    assert transformed["category_A"].tolist() == [1, 0, 1, 0, 0]
+    assert transformed["category_B"].tolist() == [0, 1, 0, 0, 1]
+    assert transformed["category_C"].tolist() == [0, 0, 0, 1, 0]
+    
+    # Check original column removed
+    assert "category" not in transformed.columns
+    
+    # Check other columns unchanged
+    assert (transformed["value"] == df["value"]).all()
+
+
+def test_one_hot_encoder_with_missing():
+    """Test OneHotEncoder with missing values."""
+    df = pd.DataFrame({
+        "category": ["A", "B", None, "A", "C"],
+        "value": [1, 2, 3, 4, 5]
+    })
+    
+    encoder = OneHotEncoder({"columns": ["category"]})
+    encoder.fit(df)
+    transformed = encoder.transform(df)
+    
+    # Should handle NaN values
+    assert "category_nan" in transformed.columns or "_nan" in "".join(transformed.columns)
+
+
+def test_log_transformer():
+    """Test LogTransformer."""
+    df = pd.DataFrame({
+        "positive_values": [1, 10, 100, 1000],
+        "with_zero": [0, 1, 10, 100],
+        "negative": [-1, 1, 10, 100]  # Should skip or handle negative
+    })
+    
+    transformer = LogTransformer({"columns": ["positive_values"]})
+    transformer.fit(df)
+    transformed = transformer.transform(df)
+    
+    # Check log transformation
+    expected = np.log1p(df["positive_values"])  # log(1 + x)
+    assert np.allclose(transformed["positive_values"], expected)
+    
+    # Test with offset for zero/negative values
+    transformer2 = LogTransformer({
+        "columns": ["with_zero"],
+        "offset": 1
+    })
+    transformed2 = transformer2.transform(df)
+    expected2 = np.log(df["with_zero"] + 1)  # log(x + offset)
+    assert np.allclose(transformed2["with_zero"], expected2)
+```
+
+tests/test_config_manager.py
+
+```python
+"""
+Tests for ConfigManager.
+"""
+
+import os
+import json
+import tempfile
+import pytest
+import yaml
+from config.manager import ConfigManager, ConfigFormat
+
+
+def test_default_config():
+    """Test loading default configuration."""
+    manager = ConfigManager()
+    config = manager.config
+    
+    # Check default values
+    assert config.input_path == "data/input.csv"
+    assert config.output_path == "data/output.csv"
+    assert config.progress_bar is True
+    assert config.validation_rules == []
+
+
+def test_load_yaml(tmp_path):
+    """Test loading configuration from YAML file."""
+    # Create temporary YAML file
+    yaml_content = """
+    input_path: "test_input.csv"
+    output_path: "test_output.csv"
+    progress_bar: false
+    validation_rules:
+      - check_missing
+      - check_duplicates
+    transforms:
+      - name: StandardScaler
+        params:
+          columns: ["feature1", "feature2"]
+    """
+    
+    yaml_file = tmp_path / "test_config.yaml"
+    yaml_file.write_text(yaml_content)
+    
+    # Load configuration
+    manager = ConfigManager()
+    manager.load(str(yaml_file))
+    
+    # Verify loaded values
+    assert manager.config.input_path == "test_input.csv"
+    assert manager.config.output_path == "test_output.csv"
+    assert manager.config.progress_bar is False
+    assert manager.config.validation_rules == ["check_missing", "check_duplicates"]
+    assert len(manager.config.transforms) == 1
+    assert manager.config.transforms[0]["name"] == "StandardScaler"
+
+
+def test_load_json(tmp_path):
+    """Test loading configuration from JSON file."""
+    # Create temporary JSON file
+    json_content = {
+        "input_path": "json_input.csv",
+        "output_path": "json_output.csv",
+        "progress_bar": True,
+        "validation_rules": ["check_types"],
+        "validate_after_each": True
+    }
+    
+    json_file = tmp_path / "test_config.json"
+    json_file.write_text(json.dumps(json_content))
+    
+    # Load configuration
+    manager = ConfigManager()
+    manager.load(str(json_file))
+    
+    # Verify loaded values
+    assert manager.config.input_path == "json_input.csv"
+    assert manager.config.output_path == "json_output.csv"
+    assert manager.config.progress_bar is True
+    assert manager.config.validation_rules == ["check_types"]
+    assert manager.config.validate_after_each is True
+
+
+def test_save_config(tmp_path):
+    """Test saving configuration to file."""
+    manager = ConfigManager()
+    
+    # Modify some values
+    manager.config.input_path = "save_test.csv"
+    manager.config.progress_bar = False
+    
+    # Save as YAML
+    yaml_file = tmp_path / "saved_config.yaml"
+    manager.save(str(yaml_file), fmt=ConfigFormat.YAML)
+    
+    # Load back and verify
+    manager2 = ConfigManager()
+    manager2.load(str(yaml_file))
+    
+    assert manager2.config.input_path == "save_test.csv"
+    assert manager2.config.progress_bar is False
+    
+    # Save as JSON
+    json_file = tmp_path / "saved_config.json"
+    manager.save(str(json_file), fmt=ConfigFormat.JSON)
+    
+    # Verify JSON content
+    with open(json_file, 'r') as f:
+        json_data = json.load(f)
+    
+    assert json_data["input_path"] == "save_test.csv"
+
+
+def test_invalid_config_file(tmp_path):
+    """Test handling of invalid configuration file."""
+    invalid_file = tmp_path / "invalid.txt"
+    invalid_file.write_text("This is not YAML or JSON")
+    
+    manager = ConfigManager()
+    
+    with pytest.raises(ValueError, match="Unsupported config file format"):
+        manager.load(str(invalid_file))
+```
+
+tests/test_validators.py
+
+```python
+"""
+Tests for data validators.
+"""
+
+import pandas as pd
+import numpy as np
+import pytest
+from utils.validators import DataValidator, ValidationError
+
+
+def test_check_missing():
+    """Test missing value validation."""
+    validator = DataValidator()
+    
+    # Test with missing values
+    df = pd.DataFrame({
+        "a": [1, 2, None, 4],
+        "b": [5, 6, 7, 8],
+        "c": [None, None, 9, 10]
+    })
+    
+    errors = validator._check_check_missing(df)
+    assert len(errors) == 2  # Columns a and c
+    assert "Column 'a':" in errors[0]
+    assert "Column 'c':" in errors[1]
+    
+    # Test without missing values
+    df_clean = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    errors = validator._check_check_missing(df_clean)
+    assert len(errors) == 0
+
+
+def test_check_types():
+    """Test type validation."""
+    validator = DataValidator()
+    
+    # Test with mixed types
+    df = pd.DataFrame({
+        "num_score": [1, 2, 3],  # Should be numeric ✓
+        "value_pct": [0.1, 0.2, 0.3],  # Should be numeric ✓
+        "category_score": ["a", "b", "c"],  # Should be numeric but is string ✗
+        "regular_column": [1, 2, 3],  # Not in pattern, no validation
+        "total_count": ["10", "20", "30"]  # Should be numeric but is string ✗
+    })
+    
+    errors = validator._check_check_types(df)
+    assert len(errors) == 2  # category_score and total_count
+    assert any("category_score" in e for e in errors)
+    assert any("total_count" in e for e in errors)
+
+
+def test_check_range():
+    """Test range validation."""
+    validator = DataValidator()
+    
+    df = pd.DataFrame({
+        "value_pct": [0.1, 0.5, 1.5],  # 1.5 > 1 ✗
+        "discount_pct": [-0.1, 0.2, 0.3],  # -0.1 < 0 ✗
+        "is_active": [1, 0, 2],  # 2 not in [0, 1] ✗
+        "regular_column": [-100, 0, 100]  # No validation
+    })
+    
+    errors = validator._check_check_range(df)
+    assert len(errors) == 3
+    assert any("value_pct" in e for e in errors)
+    assert any("discount_pct" in e for e in errors)
+    assert any("is_active" in e for e in errors)
+
+
+def test_check_duplicates():
+    """Test duplicate validation."""
+    validator = DataValidator()
+    
+    # Test with duplicates
+    df = pd.DataFrame({
+        "a": [1, 2, 3, 1],
+        "b": ["x", "y", "z", "x"]
+    })
+    
+    errors = validator._check_check_duplicates(df)
+    assert len(errors) == 1
+    assert "duplicate" in errors[0].lower()
+    
+    # Test without duplicates
+    df_unique = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
+    errors = validator._check_check_duplicates(df_unique)
+    assert len(errors) == 0
+
+
+def test_check_negative():
+    """Test negative value validation."""
+    validator = DataValidator()
+    
+    df = pd.DataFrame({
+        "total_amount": [100, -50, 200],  # -50 < 0 ✗
+        "item_count": [1, 2, 3],  # All positive ✓
+        "transaction_count": [0, -1, 2],  # -1 < 0 ✗
+        "balance": [-100, 0, 100]  # Not in pattern, no validation
+    })
+    
+    errors = validator._check_check_negative(df)
+    assert len(errors) == 2
+    assert any("total_amount" in e for e in errors)
+    assert any("transaction_count" in e for e in errors)
+
+
+def test_custom_rule():
+    """Test adding and using custom validation rule."""
+    validator = DataValidator()
+    
+    # Define custom rule
+    def check_specific_column(df):
+        if "required_column" not in df.columns:
+            return ["Missing required column: 'required_column'"]
+        return []
+    
+    validator.add_custom_rule("check_required_column", check_specific_column)
+    
+    # Test with missing column
+    df = pd.DataFrame({"other_column": [1, 2, 3]})
+    
+    with pytest.raises(ValidationError) as exc_info:
+        validator.validate(df, ["check_required_column"])
+    
+    assert "Missing required column" in str(exc_info.value)
+    
+    # Test with column present
+    df_with_column = pd.DataFrame({"required_column": [1, 2, 3]})
+    validator.validate(df_with_column, ["check_required_column"])  # Should not raise
+
+
+def test_validate_method():
+    """Test the main validate method."""
+    validator = DataValidator()
+    
+    df = pd.DataFrame({
+        "num_score": [1, None, 3],
+        "value_pct": [1.5, 0.5, 0.3]
+    })
+    
+    # Should raise ValidationError with multiple issues
+    with pytest.raises(ValidationError) as exc_info:
+        validator.validate(df, ["check_missing", "check_range"])
+    
+    error_msg = str(exc_info.value)
+    assert "Data validation failed" in error_msg
+    assert "missing" in error_msg.lower()
+    assert "range" in error_msg.lower()
+```
+
+tests/test_pipeline.py
+
+```python
+"""
+Integration tests for the pipeline.
+"""
+
+import pandas as pd
+import numpy as np
+import tempfile
+import os
+import json
+from pipeline.main import DataPipeline
+
+
+def test_pipeline_integration():
+    """Test complete pipeline integration."""
+    # Create temporary directory for test files
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Create test data
+        test_data = pd.DataFrame({
+            "feature1": [1, 2, 3, 4, 5],
+            "feature2": [10, 20, 30, 40, 50],
+            "category": ["A", "B", "A", "B", "C"],
+            "target": [0.1, 0.2, 0.3, 0.4, 0.5]
+        })
+        
+        input_path = os.path.join(tmpdir, "input.csv")
+        output_path = os.path.join(tmpdir, "output.csv")
+        config_path = os.path.join(tmpdir, "config.yaml")
+        
+        # Save test data
+        test_data.to_csv(input_path, index=False)
+        
+        # Create configuration
+        config = {
+            "input_path": input_path,
+            "output_path": output_path,
+            "progress_bar": False,  # Disable for testing
+            "validation_rules": ["check_missing", "check_duplicates"],
+            "transforms": [
+                {
+                    "name": "StandardScaler",
+                    "params": {
+                        "columns": ["feature1", "feature2"]
+                    }
+                },
+                {
+                    "name": "OneHotEncoder",
+                    "params": {
+                        "columns": ["category"]
+                    }
+                }
+            ]
+        }
+        
+        # Save configuration
+        import yaml
+        with open(config_path, 'w') as f:
+            yaml.dump(config, f)
+        
+        # Run pipeline
+        pipeline = DataPipeline(config_path)
+        pipeline.initialize()
+        result = pipeline.run()
+        
+        # Verify results
+        assert result is not None
+        assert len(result) == len(test_data)
+        assert "category_A" in result.columns
+        assert "category_B" in result.columns
+        assert "category_C" in result.columns
+        
+        # Verify scaling
+        assert np.allclose(result["feature1"].mean(), 0, atol=1e-7)
+        assert np.allclose(result["feature2"].mean(), 0, atol=1e-7)
+        
+        # Verify output file exists
+        assert os.path.exists(output_path)
+        
+        # Verify summary
+        summary = pipeline.get_summary()
+        assert summary["input_rows"] == len(test_data)
+        assert summary["output_rows"] == len(result)
+        assert summary["transforms_applied"] == 2
+
+
+def test_pipeline_validation_failure():
+    """Test pipeline with validation failure."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Create test data with issues
+        test_data = pd.DataFrame({
+            "feature1": [1, 2, None, 4],
+            "feature2": [10, 20, 30, 40]
+        })
+        
+        input_path = os.path.join(tmpdir, "input.csv")
+        config_path = os.path.join(tmpdir, "config.yaml")
+        
+        test_data.to_csv(input_path, index=False)
+        
+        # Configuration with strict validation
+        config = {
+            "input_path": input_path,
+            "output_path": os.path.join(tmpdir, "output.csv"),
+            "validation_rules": ["check_missing"],
+            "transforms": []
+        }
+        
+        import yaml
+        with open(config_path, 'w') as f:
+            yaml.dump(config, f)
+        
+        # Should fail validation
+        pipeline = DataPipeline(config_path)
+        pipeline.initialize()
+        
+        from utils.validators import ValidationError
+        with pytest.raises(ValidationError):
+            pipeline.run()
+```
+
+5. Create the CLI wrapper:
+
+cli/run_pipeline.py
+
+```python
+"""
+Command-line interface for the data pipeline.
+"""
+
+import argparse
+import sys
+import os
+from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.append(str(Path(__file__).parent.parent))
+
+from pipeline.main import DataPipeline
+from utils.logger import setup_logger
+
+
+def main():
+    """Main CLI entry point."""
+    parser = argparse.ArgumentParser(
+        description="Data Processing Pipeline - Process and transform data with configurable pipeline",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  %(prog)s -c config/pipeline_config.yaml
+  %(prog)s -c config.yaml -i data/input.csv -o results/output.csv
+  %(prog)s --config config.json --validate-only
+        """
+    )
+    
+    parser.add_argument(
+        "-c", "--config",
+        help="Path to configuration file (YAML or JSON)",
+        default=None
+    )
+    
+    parser.add_argument(
+        "-i", "--input",
+        help="Override input file path",
+        default=None
+    )
+    
+    parser.add_argument(
+        "-o", "--output",
+        help="Override output file path",
+        default=None
+    )
+    
+    parser.add_argument(
+        "--validate-only",
+        action="store_true",
+        help="Only validate data without processing",
+        default=False
+    )
+    
+    parser.add_argument(
+        "--summary",
+        action="store_true",
+        help="Print detailed summary after processing",
+        default=False
+    )
+    
+    parser.add_argument(
+        "--verbose", "-v",
+        action="count",
+        default=0,
+        help="Increase verbosity level (-v for INFO, -vv for DEBUG)"
+    )
+    
+    parser.add_argument(
+        "--version",
+        action="store_true",
+        help="Show version information"
+    )
+    
+    args = parser.parse_args()
+    
+    # Show version
+    if args.version:
+        try:
+            import importlib.metadata
+            version = importlib.metadata.version("duck-brilliance-pipeline")
+            print(f"Data Processing Pipeline v{version}")
+        except:
+            print("Data Processing Pipeline (development version)")
+        return
+    
+    # Set up logger based on verbosity
+    if args.verbose >= 2:
+        log_level = "DEBUG"
+    elif args.verbose >= 1:
+        log_level = "INFO"
+    else:
+        log_level = "WARNING"
+    
+    logger = setup_logger("CLI", level=log_level)
+    
+    try:
+        # Initialize pipeline
+        logger.info("Initializing pipeline...")
+        pipeline = DataPipeline(args.config)
+        pipeline.initialize()
+        
+        # Override paths if provided
+        if args.input:
+            pipeline.config_manager.config.input_path = args.input
+            logger.info(f"Using input path: {args.input}")
+        
+        if args.output:
+            pipeline.config_manager.config.output_path = args.output
+            logger.info(f"Using output path: {args.output}")
+        
+        # Run validation only if requested
+        if args.validate_only:
+            logger.info("Running validation only...")
+            data = pipeline.load_data()
+            pipeline.validate(data)
+            print("✓ Validation passed successfully!")
+            return
+        
+        # Run full pipeline
+        logger.info("Starting pipeline execution...")
+        result = pipeline.run()
+        
+        # Print success message
+        print("✓ Pipeline completed successfully!")
+        
+        # Print summary if requested
+        if args.summary:
+            summary = pipeline.get_summary()
+            print("\n" + "="*50)
+            print("PIPELINE SUMMARY")
+            print("="*50)
+            print(f"Input:  {summary['input_rows']} rows, {summary['input_columns']} columns")
+            print(f"Output: {summary['output_rows']} rows, {summary['output_columns']} columns")
+            print(f"Transforms applied: {summary['transforms_applied']}")
+            print(f"Validation rules: {', '.join(summary['validation_rules'])}")
+            
+            # Show column changes
+            input_cols = set(summary['input_columns_list'])
+            output_cols = set(summary['output_columns_list'])
+            added = output_cols - input_cols
+            removed = input_cols - output_cols
+            
+            if added:
+                print(f"Added columns: {', '.join(sorted(added))}")
+            if removed:
+                print(f"Removed columns: {', '.join(sorted(removed))}")
+            
+            print(f"Output saved to: {pipeline.config_manager.config.output_path}")
+            print("="*50)
+        else:
+            # Basic info
+            output_path = pipeline.config_manager.config.output_path
+            print(f"Output saved to: {output_path}")
+            print(f"Processed {len(result)} rows with {len(result.columns)} columns")
+    
+    except Exception as e:
+        logger.error(f"Pipeline failed: {e}")
+        
+        # Provide helpful error messages
+        if "No such file or directory" in str(e):
+            print(f"\nError: File not found. Check that the input file exists.")
+        elif "Unsupported config file format" in str(e):
+            print(f"\nError: Configuration file must be YAML (.yaml/.yml) or JSON (.json)")
+        elif "Data validation failed" in str(e):
+            print(f"\nValidation Error: {e}")
+        elif "ModuleNotFoundError" in str(e):
+            print(f"\nError: Missing dependency. Try: pip install -r requirements.txt")
+        else:
+            print(f"\nError: {e}")
+        
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+6. Update requirements.txt:
+
+requirements.txt (updated)
+
+```txt
+# Core dependencies
+pandas>=1.3.0
+numpy>=1.21.0
+pyyaml>=6.0
+scikit-learn>=1.0.0
+
+# Optional dependencies (for progress bars)
+tqdm>=4.62.0
+
+# Development dependencies
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=22.0.0
+flake8>=4.0.0
+
+# CLI dependencies (included in pyproject.toml)
+# click>=8.0.0  # Alternative for more complex CLI
+```
+
+7. Create pyproject.toml for packaging:
+
+pyproject.toml
+
+```toml
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "duck-brilliance-pipeline"
+version = "0.1.0"
+description = "A configurable data processing pipeline for transformation and validation"
+readme = "README.md"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Data Scientists/ML Engineers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "pandas>=1.3.0",
+    "numpy>=1.21.0",
+    "pyyaml>=6.0",
+    "scikit-learn>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "tqdm>=4.62.0",
+]
+full = [
+    "tqdm>=4.62.0",
+]
+
+[project.scripts]
+duck-brilliance-pipeline = "cli.run_pipeline:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+exclude = ["tests", "tests.*", "examples", "examples.*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+```
+
+8. Update the README with usage instructions:
+
+Add to README.md:
+
+```markdown
+## Installation
+
+```bash
+# Install from source
+pip install -e .
+
+# Or install with all optional dependencies
+pip install -e ".[full]"
+
+# For development
+pip install -e ".[dev]"
+```
+
+Command Line Usage
+
+```bash
+# Basic usage with config file
+duck-brilliance-pipeline -c config/pipeline_config.yaml
+
+# Override input/output paths
+duck-brilliance-pipeline -c config.yaml -i data/my_input.csv -o results/processed.csv
+
+# Validate only (don't process)
+duck-brilliance-pipeline -c config.yaml --validate-only
+
+# Get detailed summary
+duck-brilliance-pipeline -c config.yaml --summary
+
+# Verbose output
+duck-brilliance-pipeline -c config.yaml -vv
+
+# Show version
+duck-brilliance-pipeline --version
+```
+
+Python API Usage
+
+```python
+from pipeline.main import DataPipeline
+
+# Initialize with config
+pipeline = DataPipeline("config/pipeline_config.yaml")
+pipeline.initialize()
+
+# Run the pipeline
+result = pipeline.run()
+
+# Get summary
+summary = pipeline.get_summary()
+print(f"Processed {summary['input_rows']} rows")
+
+# Just validate data
+data = pipeline.load_data("data/input.csv")
+pipeline.validate(data)
+```
+
+Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=.
+
+# Run specific test module
+pytest tests/test_transforms.py -v
+```
+
+```
+
+## Directory Structure
+
+After implementing all these pieces, your project structure should look like:
+
+```
+
+duck-brilliance-pipeline/
+├── config/
+│   ├── init.py
+│   ├── manager.py
+│   └── pipeline_config.yaml
+├── core/
+│   ├── init.py
+│   ├── transforms.py
+│   └── factory.py
+├── pipeline/
+│   ├── init.py
+│   └── main.py
+├── utils/
+│   ├── init.py
+│   ├── progress.py
+│   ├── validators.py
+│   └── logger.py
+├── cli/
+│   └── run_pipeline.py
+├── tests/
+│   ├── init.py
+│   ├── test_transforms.py
+│   ├── test_config_manager.py
+│   ├── test_validators.py
+│   └── test_pipeline.py
+├── data/
+│   ├── input.csv
+│   └── output.csv
+├── pyproject.toml
+├── requirements.txt
+└── README.md
+
+```
+
+## Testing the Implementation
+
+1. **Install the package:**
+```bash
+pip install -e .
+```
+
+1. Run the pipeline via CLI:
+
+```bash
+# With example config
+duck-brilliance-pipeline -c config/pipeline_config.yaml --summary
+
+# Or override paths
+duck-brilliance-pipeline -c config/pipeline_config.yaml -i data/input.csv -o results/output.csv -vv
+```
+
+1. Run tests:
+
+```bash
+pytest -v
+```
+
+1. Use in Python:
+
+```python
+from pipeline.main import DataPipeline
+
+pipeline = DataPipeline("config/pipeline_config.yaml").initialize()
+result = pipeline.run()
+print(pipeline.get_summary())
+```
+
+Key Features Now Implemented:
+
+1. ✅ Optional tqdm Progress Bars - Configurable via progress_bar flag
+2. ✅ Robust Validation System - With built-in rules and custom rule support
+3. ✅ Comprehensive Unit Tests - Covering transforms, config, validation, and pipeline
+4. ✅ Full CLI Interface - With helpful error messages and options
+5. ✅ Packaging Ready - With pyproject.toml and entry points
+6. ✅ Modular Design - Easy to extend with new transforms or validators
+
+The pipeline is now production-ready with proper error handling, logging, validation, and user-friendly interfaces!
