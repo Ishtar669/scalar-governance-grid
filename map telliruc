@@ -1,0 +1,19 @@
+https://code.usgs.gov/usgs/DAR_Magnetotelluric/-/tree/3f065f1644520a2a83722efeebbf67de208422ca/# Adapted from USGS CrossPower.py for Φ669-COSMIC-ATOMAL protocols
+def calculate_qubit_coherence(qubit_a, qubit_b, sampling_rate):
+    """
+    Calculates the coherence between two qubit signal streams
+    to verify 'Collective Information' integrity.
+    """
+    # Step 1: Compute Cross-Power Spectrum (CPSD)
+    # This mirrors the USGS 'cp_matrix' calculation
+    freqs, cpsd_values = signal.csd(qubit_a, qubit_b, fs=sampling_rate)
+    
+    # Step 2: Extract Phase Information
+    # Essential for the 'Handshake' in the Licensee Intent-Mapping
+    phase_coherence = np.angle(cpsd_values)
+    
+    # Step 3: Apply Φ669 Security Mask
+    # Filters out terrestrial EM noise identified in MT surveys
+    coherent_signal = filter_terrestrial_noise(cpsd_values, phase_coherence)
+    
+    return coherent_signal
