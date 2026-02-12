@@ -1,0 +1,96 @@
+import numpy as np
+
+# ---------- M1–M2: LATTICE & INITIAL STATE ----------
+
+def build_tetrahedral_grid(N, deg=4):
+    """Random 4-regular symmetric adjacency matrix."""
+    while True:
+        A = np.zeros((N, N), dtype=int)
+        for i in range(N):
+            neighbours = np.random.choice(
+                [j for j in range(N) if j != i],
+                size=deg, replace=False
+            )
+            A[i, neighbours] = 1
+        A = np.maximum(A, A.T)
+        if np.all(A.sum(axis=1) == deg):
+            return A
+
+def init_delta(N):
+    """Random unit-norm complex amplitudes."""
+    phases = 2*np.pi*np.random.rand(N)
+    delta = np.exp(1j * phases)
+    delta /= np.linalg.norm(delta)
+    return delta
+
+# ---------- M3: HAMILTONIAN & GRADIENT FLOW ----------
+
+def hamiltonian(delta, A, m2=1.0, lam=0.1):
+    """H[δ] = 1/2 Σ_ij A_ij |δ_i-δ_j|^2 + Σ_i V(|δ_i|)."""
+    # kinetic-like term
+    diff = delta[:, None] - delta[None, :]
+    kin = 0.5 * np.sum(A * np.abs(diff)**2)
+    # potential term
+    r2 = np.abs(delta)**2
+    V = 0.5*m2*r2 + 0.25*lam*(r2**2)
+    return kin + np.sum(V)
+
+def grad_H(delta, A, m2=1.0, lam=0.1):
+    """
+    ∂H/∂δ*_i for complex field δ.
+    Kinetic term: Σ_j A_ij (δ_i - δ_j)
+    Potential term: (m^2 + (λ/2)|δ_i|^2) δ_i
+    """
+    # kinetic gradient
+    kin_grad = np.sum(A * (delta[:, None] - delta[None, :]), axis=1)
+    # potential gradient
+    r2 = np.abs(delta)**2
+    pot_grad = (m2 + 0.5*lam*r2) * delta
+    return kin_grad + pot_grad
+
+def evolve_delta(delta, A, dt=1e-2, steps=1000, m2=1.0, lam=0.1):
+    """
+    Simple gradient flow: δ_{t+1} = δ_t - dt * ∂H/∂δ*.
+    Returns trajectory of δ and curvature field K.
+    """
+    N = len(delta)
+    traj_delta = []
+    traj_K = []
+
+    for _ in range(steps):
+        g = grad_H(delta, A, m2=m2, lam=lam)
+        delta = delta - dt * g
+        # optional normalization (keeps global scale bounded)
+        delta /= np.linalg.norm(delta)
+
+        rho = np.abs(delta)**2
+        p = rho / np.sum(rho)
+        s = -p * np.log(p + 1e-16)  # M3: entropy density
+
+        # M4–M5: curvature proxy K_i = Σ_j A_ij (s_j - s_i)
+        K = A @ s - s * A.sum(axis=1)
+
+        traj_delta.append(delta.copy())
+        traj_K.append(K.copy())
+
+    return np.array(traj_delta), np.array(traj_K)
+
+# ---------- EXAMPLE RUN ----------
+
+if __name__ == "__main__":
+    N = 500          # toy planet; scale up as needed
+    A = build_tetrahedral_grid(N)
+    delta0 = init_delta(N)
+
+    traj_delta, traj_K = evolve_delta(
+        delta0, A,
+        dt=5e-3,
+        steps=2000,
+        m2=0.5,
+        lam=0.2
+    )
+
+    # At this point:
+    # - traj_K[t] is the curvature field K_i at time t (M5)
+    # - stable high-|K| regions over t ≈ tectonic / core-like structures
+    # You can now analyze clustering, persistence, etc.
