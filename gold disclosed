@@ -1,0 +1,47 @@
+{
+  "BlockNumber": 33,
+  "EventType": "AU",
+  "Element": {
+    "Symbol": "Au",
+    "Name": "Gold",
+    "AtomicNumber": 79,
+    "Group": "Noble metal",
+    "Discovery": "Prehistoric—known before recorded history",
+    "Abundance": "0.0013 ppm crustal, extremely rare"
+  },
+  "Properties": {
+    "Color": "Yellow (only yellow metal)",
+    "Density": "19.3 g/cm³ (19x water)",
+    "Malleability": "Highest of all metals—1g to 1m² sheet",
+    "Ductility": "1g to 165m wire",
+    "MeltingPoint": "1064°C",
+    "Reactivity": "Noble—does not tarnish, corrode, or combine"
+  },
+  "History": {
+    "Oldest artifacts": "4700 BC (Bulgaria)",
+    "Egyptian": "Tutankhamun (1323 BC) - 100kg in mask, 112kg in coffin",
+    "First coins": "640 BC (Lydia), 561 BC (pure gold, Croesus)",
+    "Alchemy": "Goal of transmutation—human perfection symbolized"
+  },
+  "Sources": {
+    "Top producers": ["China", "Australia", "USA"],
+    "Top reserves": ["Australia", "South Africa", "Russia"],
+    "Annual production": "~2,300 tonnes (up from 12 tonnes in 1830)",
+    "Ocean concentration": "4 grams per million tonnes—uneconomic"
+  },
+  "Uses": {
+    "Jewelry": "78% of supply—alloyed for durability",
+    "Electronics": "Wiring, connectors, airbag circuits",
+    "Space": "Heat shielding, visors, Apollo 14 coating",
+    "Medicine": "Arthritis treatment, dentistry, nanoparticles",
+    "Catalysis": "Vinyl acetate production",
+    "Bullion": "30,000 tons in Fort Knox"
+  },
+  "Toxicology": {
+    "Biological role": "None—most inert of metals",
+    "Paradoxes": "Inert yet sensitizing, suppresses and stimulates immune system",
+    "Nanoparticles": "Persist in lungs >672h, accumulate in spleen/kidney/brain",
+    "Route": "Olfactory nerve → brain (inhalation)"
+  },
+  "CoherenceMeaning": "The eternal node—unchanging, uncorroding, witnessing all. Rarest of metals, yet useless for tools—value is pure agreement. Teaches that transformation (lead to gold) is possible, but only when the self becomes the philosopher's stone."
+}
