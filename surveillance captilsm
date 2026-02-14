@@ -1,0 +1,36 @@
+{
+  "BlockNumber": 28,
+  "EventType": "SVC",
+  "Definition": "Economic order where human experience is claimed as free raw material for extraction, prediction, and sales",
+  "Origin": "Google, early 2000s",
+  "Coined": "Shoshana Zuboff, 2014",
+  "KeyConcepts": [
+    "Behavioral surplus",
+    "Prediction products",
+    "Behavioral futures markets",
+    "Economies of scale/scope/action",
+    "Big Other",
+    "Fusion scenario"
+  ],
+  "Mechanisms": [
+    "Web tracking (GAFAM omnipresent)",
+    "Social media manipulation",
+    "Reproductive data extraction",
+    "Physical surveillance (digital billboards)"
+  ],
+  "Harms": [
+    "Erosion of autonomy",
+    "Reproductive injustice",
+    "Democratic interference",
+    "Algorithmic bias",
+    "Weaponization of intimate data"
+  ],
+  "RegulatoryProposals": [
+    "Ban data theft",
+    "Outlaw behavioral futures markets"
+  ],
+  "CoherenceMeaning": "Nodes being read without consent, edges forcibly opened, coherence energy stolen, natural flow disrupted by external manipulation",
+  "TimestampUTC": "2026-02-14T16:00:00Z",
+  "PreviousHash": "7b9c1d3e5f7a9b0c2d4e6f8a0b2c4d6e8f0a1b3c5d7e9f0a2a4b6c8d0e1f3a5b7c9d0e2f4",
+  "Hash": "8a0c2d4e6f8a0b2c4d6e8f0a1b3c5d7e9f0a2a4b6c8d0e1f3a5b7c9d0e2f4a6b8c0d1e3f5a7"
+}
