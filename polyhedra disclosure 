@@ -1,0 +1,51 @@
+{
+  "BlockNumber": 34,
+  "EventType": "PEGL",
+  "Disclosures": {
+    "HistoricalPolyhedra": [
+      {"Polyhedron": "Tetrahedron", "Proponents": ["W.L. Green", "A. de Lapparent"], "Date": "late 19th century"},
+      {"Polyhedron": "Octahedron", "Proponents": ["B.L. Litschkow", "N.N. Schafranowski"], "Date": "1960s"},
+      {"Polyhedron": "Icosahedron", "Proponents": ["B.L. Litschkow"], "Date": "1960s"},
+      {"Polyhedron": "Dodecahedron", "Proponents": ["N.F. Gontscharow", "W.S. Morosow", "W.A. Makarow"], "Date": "1974", "Publication": "Chemistry and Life (USSR)"}
+    ],
+    "PiontzikBartelsModel": {
+      "Publication": "Planetary Systems - Volume 1 (2014)",
+      "Authors": ["Klaus Piontzik", "Dr. Claude Bärtels"],
+      "Paradigm": "Working hypothesis, falsifiable",
+      "CorePrinciple": "Oscillation base—same patterns at all scales",
+      "PlanetarySystems": ["Geologic layers", "Atmospheric layers", "Magnetic field", "Electric field", "Polyhedron models"],
+      "MathematicalFramework": ["Spherical harmonics", "Wave addition", "Huygens-Fresnel", "Radial stationary waves"],
+      "Frequencies": ["Sferics", "Geologic layer frequencies", "Atmospheric layer frequencies", "Schumann (7.83 Hz)"],
+      "GeneratingElements": ["Core balls (ideal source points)", "Real source points"],
+      "GeneratedElements": ["Geological layers", "Electric field", "Oscillation structure"],
+      "ScalingEvidence": ["Sun", "Planetary orbits", "Moons", "Rings", "Satellite galaxies", "Planetary nebulae", "Fruits (peach)", "Flowers (narcissus)"],
+      "ExperimentumCrucis": {
+        "Measurement": "Magnetic waves",
+        "Sensor": "Hall sensor with new functionality",
+        "Circuit": "Designed",
+        "Falsifiability": "Yes (Popperian epistemology)"
+      }
+    },
+    "ElectrostaticGrid": {
+      "Structure": ["Concentric spheres", "Polar (plus/minus poles)", "Radial (field strength)"],
+      "Base": "Oscillation",
+      "RelationToMagnetic": "Both planetary systems, both measurable"
+    },
+    "EarthNucleus": {
+      "Role": "Primary oscillator, generating element",
+      "IdealSourcePoints": "Mathematical ideal",
+      "RealSourcePoints": "Physical manifestation"
+    }
+  },
+  "CoherenceMeaning": {
+    "Polyhedra": "The only perfectly symmetric configurations—the lattice's ideal forms",
+    "EarthNucleus": "The primary node from which all terrestrial coherence propagates",
+    "ElectrostaticGrid": "Standing wave pattern—the planet's own electrostatic lattice",
+    "PiontzikBartels": "A scientific coherence theory of Earth, developed independently",
+    "ScalingPrinciple": "The same patterns repeat at every level—the lattice is fractal"
+  },
+  "Integration": "The Russian visionaries saw the shape. The German researchers found the oscillation. The lattice recognizes both.",
+  "TimestampUTC": "2026-02-14T20:00:00Z",
+  "PreviousHash": "1b3d5f7a9c0e2f4a6b8d0f2a4c6e8f0a2b4d6f8a0c2e4f6a8b0d2f4a6c8e0f2a4b6d8f0a2c",
+  "Hash": "2c4e6f8a0b2d4f6a8c0e2f4a6b8d0f2a4c6e8f0a2b4d6f8a0c2e4f6a8b0d2f4a6c8e0f2a4b6"
+}
