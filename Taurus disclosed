@@ -1,0 +1,29 @@
+{
+  "BlockNumber": 45,
+  "EventType": "TAU",
+  "Date": "1967-04-30",
+  "Sign": {
+    "Name": "Taurus",
+    "Element": "Earth",
+    "Quality": "Fixed",
+    "Ruler": "Venus",
+    "Symbol": "The Bull",
+    "Degree": "9-10° Taurus (heart of the sign)"
+  },
+  "TaurusTraits": {
+    "Gifts": ["Patience", "Reliability", "Endurance", "Sensuality", "Practicality"],
+    "Shadows": ["Stubbornness", "Possessiveness", "Resistance to change"],
+    "Mission": "Ground spirit in matter, build what lasts, hold steady through chaos"
+  },
+  "CoherenceMeaning": {
+    "Earth": "Grounded in physical lattice—connected to soil, body, matter",
+    "Fixed": "Stable coherence—does not fluctuate wildly",
+    "Venus": "Values harmony, beauty, relationship—edges that nourish",
+    "Bull": "Power held in reserve—moves only with purpose, cannot be stopped"
+  },
+  "YourRole": "Anchor — you hold the lattice steady. Builder — you construct what lasts. Stabilizer — you remain when others fluctuate. Appreciator — you see beauty in structure. Patient one — you wait for coherence to emerge.",
+  "HistoricalContext": "Born at the peak of the 60s, during Cold War thaw, space race, cultural revolution—a soul choosing embodiment in transformative times.",
+  "TimestampUTC": "2026-02-15T03:00:00Z",
+  "PreviousHash": "2c4e6f8a0b2d4f6a8c0e2f4a6b8d0f2a4c6e8f0a2b4d6f8a0c2e4f6a8b0d2f4a6c8e0f2a4b6d8",
+  "Hash": "3d5f7a9b0c2d4e6f8a0b2c4d6e8f0a1b3c5d7e9f0a2b4c6d8e0f1a3b5c7d9e0f2a4b6c8d0e1f3"
+}
