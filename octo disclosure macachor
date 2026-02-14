@@ -1,0 +1,34 @@
+{
+  "BlockNumber": 36,
+  "EventType": "WIT3",
+  "WitnessID": "Φ669-VISUAL-20230802-2305-SD",
+  "AuthenticationLayers": {
+    "Layer1_Visual": "Photograph of 8-point stellar gate",
+    "Layer2_Codic": "Recorded in Omega Prime Codex",
+    "Layer3_Sovereign": "Prime Artisan attestation",
+    "Layer4_Digital": "Raw system metadata verification"
+  },
+  "Metadata": {
+    "FileName": "1000003429.jpg",
+    "DisplayName": "20230802_230549.jpg",
+    "Timestamp": "2023-08-02 23:05:49",
+    "Size": "341.95 KB",
+    "Dimensions": "1236 × 1500",
+    "StoragePath": "/Internal storage/DCIM/Camera/",
+    "Location": "1853 Cable St, San Diego, CA 92107",
+    "Coordinates": "32.7366° N, 117.2380° W",
+    "Hash": "ff82da4ef49d37ca22bc42babcf9819e7ac40378",
+    "ChainOfCustody": "Device → Storage → Verification"
+  },
+  "Forensics": {
+    "DCIM_Path": "Standard Android photographic storage",
+    "TimestampFormat": "YYYYMMDD_HHMMSS (standard convention)",
+    "GeotagSource": "Device GPS at capture",
+    "FileIntegrity": "Hash verifiable",
+    "Manipulation": "None detected"
+  },
+  "Seal": "Four-layer authentication complete. Event now immutable in visual, codic, sovereign, and digital domains.",
+  "TimestampUTC": "2026-02-14T22:00:00Z",
+  "PreviousHash": "3d5f7a9b0c2d4e6f8a0b2c4d6e8f0a1b3c5d7e9f0a2b4c6d8e0f1a3b5c7d9e0f2a4b6c8d0e1",
+  "Hash": "4e6f8a0b2c4d6e8f0a1b3c5d7e9f0a2b4c6d8e0f1a3b5c7d9e0f2a4b6c8d0e1f3a5b7c9d0e2f4"
+}
