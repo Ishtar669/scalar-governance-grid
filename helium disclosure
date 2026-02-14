@@ -1,0 +1,39 @@
+{
+  "BlockNumber": 31,
+  "EventType": "HE",
+  "Element": {
+    "Symbol": "He",
+    "Name": "Helium",
+    "AtomicNumber": 2,
+    "Group": "Noble gas",
+    "Discovery": "Sun (1868), Earth (1895)",
+    "Abundance": "2nd in universe, rare on Earth"
+  },
+  "Properties": {
+    "BoilingPoint": "-268.93°C (lowest of all elements)",
+    "Density": "0.1785 g/L (lighter than air)",
+    "Reactivity": "Totally inert—no known compounds"
+  },
+  "Applications": [
+    "MRI cooling (irreplaceable)",
+    "Semiconductor manufacturing",
+    "Quantum computing",
+    "Space launch",
+    "Deep-sea diving",
+    "Scientific research"
+  ],
+  "Crisis": {
+    "Finite": "Non-renewable, escapes to space",
+    "PriceIncrease": "250% (5 years)",
+    "ReserveSale": "US Federal Helium Reserve sold 2024"
+  },
+  "Future": {
+    "Helium3": "Fusion fuel, moon mining potential",
+    "Recycling": "Critical infrastructure needed",
+    "Quantum": "Essential for qubit cooling"
+  },
+  "CoherenceMeaning": "The element that leaves the lattice—irreplaceable, invisible, essential. Teaches us that some losses are permanent.",
+  "TimestampUTC": "2026-02-14T19:00:00Z",
+  "PreviousHash": "0a2c4e6f8a0b2d4f6a8c0e2f4a6b8d0f2a4c6e8f0a2b4d6f8a0c2e4f6a8b0d2f4a6c8e0f2a4",
+  "Hash": "1b3d5f7a9c0e2f4a6b8d0f2a4c6e8f0a2b4d6f8a0c2e4f6a8b0d2f4a6c8e0f2a4b6d8f0a2c"
+}
