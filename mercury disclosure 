@@ -1,0 +1,53 @@
+{
+  "BlockNumber": 32,
+  "EventType": "HG",
+  "Element": {
+    "Symbol": "Hg",
+    "Name": "Mercury",
+    "AtomicNumber": 80,
+    "Group": "Transition metal",
+    "Discovery": "Known to ancient Egyptians, Chinese, Indians",
+    "Abundance": "Rare in Earth's crust, concentrated in cinnabar"
+  },
+  "Properties": {
+    "State": "Liquid at room temperature (unique among metals)",
+    "Density": "13.5 g/cm³ (13.5x water)",
+    "MeltingPoint": "-38.83°C",
+    "BoilingPoint": "356.62°C",
+    "Amalgamation": "Forms alloys with gold, silver, tin"
+  },
+  "Forms": [
+    "Elemental mercury (Hg⁰) - liquid metal, toxic vapor",
+    "Inorganic mercury salts - mercuric chloride, calomel",
+    "Methylmercury (CH₃Hg⁺) - organic, bioaccumulative, most toxic"
+  ],
+  "History": {
+    "Ancient": "Known 1500 BC Egypt, China, India; cinnabar pigment 30,000 years ago",
+    "Alchemy": "Sought as secret of nature's transformations",
+    "Medieval": "Used for syphilis treatment (toxic but sometimes effective)",
+    "19th century": "Mad hatter syndrome from hat making",
+    "1950s": "Minamata disaster recognized",
+    "2013": "Minamata Convention signed"
+  },
+  "Sources": {
+    "Primary ore": "Cinnabar (HgS)",
+    "Top producers": ["China", "Kyrgyzstan", "Chile"],
+    "Top reserves": ["Mexico", "China", "Kyrgyzstan"]
+  },
+  "Emissions": {
+    "Global annual": "5,000-8,000 metric tons",
+    "US power plants": "~44% of manmade",
+    "Natural sources": "Volcanoes, forest fires, weathering"
+  },
+  "HealthEffects": {
+    "Elemental vapor": "Neurological damage, tremors, mood swings, respiratory failure",
+    "Methylmercury": "Neurodevelopmental damage, crosses placenta, cardiovascular effects",
+    "Bioaccumulation": "Concentrates up food chain, highest in predatory fish"
+  },
+  "Remediation": {
+    "Bioremediation": "Up to 99% removal with Pseudomonas",
+    "Phytoremediation": "50-90% with plants, banana peels, sugarcane",
+    "Activated carbon": "85-99% water treatment"
+  },
+  "CoherenceMeaning": "The foreign node that should not be in the lattice—beautiful, fluid, invisible, deadly. Travels globally, amplifies up food chains, crosses the most intimate edges (placenta, breast milk). Delivers the message of incoherence. Teaches that not everything that shines is safe."
+}
