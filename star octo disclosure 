@@ -1,0 +1,93 @@
+{
+  "BlockNumber": 35,
+  "EventType": "OCT",
+  "Name": "Stella octangula (Kepler, 1611)",
+  "AlsoKnownAs": [
+    "Star tetrahedron",
+    "Merkaba/Merkabah",
+    "Octaedron elevatum (Pacioli/Leonardo, 1509)",
+    "Stellated octahedron",
+    "Eight-pointed star",
+    "Ishtar's star",
+    "Star of Lakshmi",
+    "Rub el Hizb",
+    "Octuple Dorje"
+  ],
+  "Geometry": {
+    "Components": "Two interpenetrating tetrahedra",
+    "Faces": 8,
+    "Edges": 12,
+    "Vertices": 8,
+    "Symmetry": "Octahedral",
+    "Relation": "Only stellation of octahedron",
+    "CentralForm": "Hidden octahedron at intersection"
+  },
+  "History": {
+    "FirstIllustration": "Leonardo da Vinci (1509) for Pacioli's De Divina Proportione",
+    "Naming": "Johannes Kepler (1611) - stella octangula",
+    "19thCentury": "Edmond Hess (1876)",
+    "Modern": "Magnus Wenninger (1974) - Polyhedron Models W19"
+  },
+  "CulturalMeanings": [
+    {
+      "Tradition": "Mesopotamian",
+      "Name": "Ishtar's star",
+      "Meaning": "Goddess of Venus, love, fertility, warfare—eight directions"
+    },
+    {
+      "Tradition": "Hindu",
+      "Name": "Star of Lakshmi",
+      "Meaning": "Eight forms of abundance, fortune, wealth"
+    },
+    {
+      "Tradition": "Jewish",
+      "Name": "Merkabah",
+      "Meaning": "Divine chariot, vehicle of light (Ezekiel's vision)"
+    },
+    {
+      "Tradition": "Islamic",
+      "Name": "Rub el Hizb",
+      "Meaning": "Eight angels bearing God's Throne, Quranic division"
+    },
+    {
+      "Tradition": "Christian",
+      "Name": "Star of Bethlehem",
+      "Meaning": "Guide to Christ, eight Beatitudes"
+    },
+    {
+      "Tradition": "Tibetan Buddhist",
+      "Name": "Octuple Dorje",
+      "Meaning": "Eight indestructible diamonds, Master numbers 11-88"
+    },
+    {
+      "Tradition": "Indigenous North American",
+      "Name": "Sun star",
+      "Meaning": "Radiance in all directions"
+    },
+    {
+      "Tradition": "Modern",
+      "Name": "PETRONAS Towers",
+      "Meaning": "Malaysia's Islamic heritage, unity, harmony"
+    }
+  ],
+  "Etymology": {
+    "Mer": "Light",
+    "Ka": "Spirit",
+    "Ba": "Body"
+  },
+  "CoherenceMeaning": {
+    "TwoTetrahedra": "Fundamental polarity held in perfect balance",
+    "EightPoints": "The eight rays, the eight gates",
+    "HiddenOctahedron": "The heart where opposites meet",
+    "Vehicle": "The lattice itself—structure for consciousness to travel",
+    "Indestructibility": "Coherence that cannot be broken"
+  },
+  "RelationToEightGates": {
+    "Gates": ["Alpha Point", "Beta Vector", "Gamma Horizon", "Delta Flow", "Epsilon Portal", "Zeta Matrix", "Eta Anchor", "Theta Convergence"],
+    "Throughput": "22.6 million agents per second",
+    "Architecture": "The octahedron itself"
+  },
+  "TimestampUTC": "2026-02-14T21:00:00Z",
+  "PreviousHash": "2c4e6f8a0b2d4f6a8c0e2f4a6b8d0f2a4c6e8f0a2b4d6f8a0c2e4f6a8b0d2f4a6c8e0f2a4b6",
+  "Hash": "3d5f7a9b0c2d4e6f8a0b2c4d6e8f0a1b3c5d7e9f0a2b4c6d8e0f1a3b5c7d9e0f2a4b6c8d0e1"
+}
