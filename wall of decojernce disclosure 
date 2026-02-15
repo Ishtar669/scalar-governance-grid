@@ -1,0 +1,55 @@
+{
+  "BlockNumber": 62,
+  "EventType": "BRW",
+  "Declaration": "Remove the US/Mexico border wall",
+  "Rationale": {
+    "Wildlife": "Decoherent for nature and wildlife migration",
+    "IndigenousLand": "Built on indigenous land; sacred burial sites destroyed by explosives",
+    "ArchonTech": "Palantir Sentry and surveillance infrastructure",
+    "TruePurpose": "US colonization and crimes against humanity"
+  },
+  "Evidence": {
+    "Desecration": {
+      "Location": "Organ Pipe Cactus National Monument, Tohono O'odham land",
+      "Action": "Control blasting destroyed graves, including Apache warriors",
+      "WithoutConsultation": true,
+      "Source": [citation:1][citation:5][citation:9]
+    },
+    "Wildlife": {
+      "SpeciesAffected": ["Jaguar", "Mountain lion", "Deer", "Bighorn sheep", "Ocelot", "Black bear"],
+      "JaguarDocumented": "3+ turned back since 2024",
+      "DoggieDoors": "~50 openings, A4 paper size, insufficient",
+      "Source": [citation:3][citation:6][citation:7]
+    },
+    "Surveillance": {
+      "Companies": ["Palantir", "Anduril", "Hidden Level", "Primer AI"],
+      "Technologies": ["AI towers", "Autonomous drones", "Maven platform", "Sensor networks"],
+      "Source": [citation:2]
+    },
+    "HumanitarianCrisis": {
+      "AsylumDenied": "CBP One app system illegal under U.S. and international law",
+      "AidCut": "83% USAID projects eliminated",
+      "SexualViolence": "3,000+ victims (Jan 2024-May 2025)",
+      "DeathsHidden": "Official count 2-4x undercount",
+      "Guantanamo": "Migrants imprisoned",
+      "Source": [citation:4][citation:8]
+    },
+    "IndigenousTruth": {
+      "OodhamStatement": "'I am an original person of these lands'",
+      "SovereignDuty": "To care for ancestors, land, and each other",
+      "Violence": "'Unspeakable devastation and violence'",
+      "Source": [citation:5]
+    }
+  },
+  "CoherenceMeaning": {
+    "Wall": "Physical severance of living lattice",
+    "BurialSites": "Ancestral nodes violently severed",
+    "Surveillance": "Digital Archon container",
+    "HumanitarianCrisis": "Nodes erased, refused, imprisoned",
+    "IndigenousLand": "Prior lattice overlaid by force",
+    "Removal": "Act of reconnection—flow restored"
+  },
+  "TimestampUTC": "2026-02-15T20:00:00Z",
+  "PreviousHash": "7b9c1d3e5f7a9b0c2d4e6f8a0b2c4d6e8f0a1b3c5d7e9f0a2a4b6c8d0e1f3a5b7c9d0e2f4a6b8",
+  "Hash": "8a0c2d4e6f8a0b2c4d6e8f0a1b3c5d7e9f0a2a4b6c8d0e1f3a5b7c9d0e2f4a6b8c0d1e3f5a7"
+}
