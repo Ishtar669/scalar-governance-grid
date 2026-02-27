@@ -1,0 +1,365 @@
+I'll provide both the Zenodo metadata configuration and the Etherscan contract verification comments for complete cross-linking.
+
+1. Zenodo Metadata Configuration
+
+`.zenodo.json` (Repository Root)
+
+```json
+{
+  "title": "Macachor-9 License System: Smart Contract Framework for Governance Standards",
+  "description": "Production-ready smart contract system implementing soulbound licensing tokens with FRAND-R compliant royalty mechanisms for technical governance standards. Features immutable on-chain authorship verification via ORCID integration, formal verification of time-lock logic, and institutional-grade security patterns.",
+  "creators": [
+    {
+      "name": "Macachor, Christopher",
+      "orcid": "0009-0008-0100-2856",
+      "affiliation": "Macachor-9 Governance Framework"
+    }
+  ],
+  "keywords": [
+    "smart contracts",
+    "ERC-721",
+    "ERC-2981",
+    "soulbound tokens",
+    "FRAND licensing",
+    "governance standards",
+    "formal verification",
+    "Arbitrum",
+    "solidity"
+  ],
+  "license": {
+    "id": "MIT"
+  },
+  "related_identifiers": [
+    {
+      "relation": "isSupplementTo",
+      "identifier": "https://github.com/chrismacachor/macachor-9",
+      "resource_type": "software"
+    },
+    {
+      "relation": "isDocumentedBy",
+      "identifier": "https://macachor-9.io/docs",
+      "resource_type": "publication-technicalnote"
+    }
+  ],
+  "version": "1.0.0",
+  "upload_type": "software",
+  "programming_language": "Solidity",
+  "development_status": "stable",
+  "funding": [
+    {
+      "funder": "Independent",
+      "award": "Self-funded development"
+    }
+  ],
+  "communities": [
+    {
+      "identifier": "ethereum"
+    },
+    {
+      "identifier": "open-source"
+    }
+  ]
+}
+```
+
+GitHub Actions Workflow for Auto-Zenodo Release
+
+```yaml
+# .github/workflows/zenodo-release.yml
+name: Zenodo Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  zenodo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Validate Zenodo metadata
+        run: |
+          python -c "import json; json.load(open('.zenodo.json'))"
+          echo "✓ Metadata valid"
+      
+      - name: Archive to Zenodo
+        env:
+          ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
+        run: |
+          # Create deposition
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $ZENODO_TOKEN" \
+            -d '{"metadata": '$(cat .zenodo.json)'}' \
+            https://zenodo.org/api/deposit/depositions > deposition.json
+          
+          DEPOSITION_ID=$(jq -r .id deposition.json)
+          echo "Created deposition: $DEPOSITION_ID"
+          
+          # Upload code archive
+          zip -r macachor-9-source.zip . -x "*.git*" -x "node_modules/*"
+          
+          curl -X POST \
+            -H "Authorization: Bearer $ZENODO_TOKEN" \
+            -F "file=@macachor-9-source.zip" \
+            "https://zenodo.org/api/deposit/depositions/$DEPOSITION_ID/files"
+          
+          # Publish
+          curl -X POST \
+            -H "Authorization: Bearer $ZENODO_TOKEN" \
+            "https://zenodo.org/api/deposit/depositions/$DEPOSITION_ID/actions/publish"
+```
+
+Post-Release ORCID Update Script
+
+```javascript
+// scripts/update-orcid.js
+const fs = require('fs');
+
+async function generateORCIDEntry() {
+    const zenodo = JSON.parse(fs.readFileSync('.zenodo.json'));
+    const deployment = JSON.parse(
+        fs.readFileSync('deployments/latest-macachor-9.json')
+    );
+    
+    const orcidEntry = {
+        "put-code": null,
+        "work-title": {
+            "title": {
+                "value": zenodo.title
+            }
+        },
+        "work-type": "software",
+        "publication-date": {
+            "year": {
+                "value": new Date().getFullYear().toString()
+            }
+        },
+        "external-ids": {
+            "external-id": [
+                {
+                    "external-id-type": "doi",
+                    "external-id-value": process.env.ZENODO_DOI,
+                    "external-id-url": {
+                        "value": `https://doi.org/${process.env.ZENODO_DOI}`
+                    },
+                    "external-id-relationship": "self"
+                },
+                {
+                    "external-id-type": "uri",
+                    "external-id-value": `https://arbiscan.io/address/${deployment.contracts.soulboundLicenseNFT.address}`,
+                    "external-id-url": {
+                        "value": `https://arbiscan.io/address/${deployment.contracts.soulboundLicenseNFT.address}`
+                    },
+                    "external-id-relationship": "part-of"
+                }
+            ]
+        },
+        "url": `https://github.com/chrismacachor/macachor-9/releases/tag/v${zenodo.version}`,
+        "contributors": {
+            "contributor": [
+                {
+                    "credit-name": {
+                        "value": "Christopher Macachor"
+                    },
+                    "contributor-orcid": {
+                        "uri": "https://orcid.org/0009-0008-0100-2856",
+                        "path": "0009-0008-0100-2856",
+                        "host": "orcid.org"
+                    },
+                    "contributor-role": "author",
+                    "contributor-attributes": {
+                        "contributor-sequence": "first"
+                    }
+                }
+            ]
+        },
+        "short-description": zenodo.description.substring(0, 500)
+    };
+    
+    fs.writeFileSync('orcid-entry.json', JSON.stringify(orcidEntry, null, 2));
+    console.log('ORCID entry generated: orcid-entry.json');
+    
+    // Manual upload instructions
+    console.log('\nTo add to ORCID:');
+    console.log('1. Go to https://orcid.org/my-orcid');
+    console.log('2. Click "+ Add works" → "Import from other sources"');
+    console.log('3. Select "DOI" and enter:', process.env.ZENODO_DOI);
+    console.log('4. Or paste the JSON from orcid-entry.json manually');
+}
+
+generateORCIDEntry();
+```
+
+---
+
+3. Etherscan Contract Verification Comments
+
+Solidity NatSpec (Source Code Comments)
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+/**
+ * @title SoulboundLicenseNFT
+ * @author Christopher Macachor (ORCID: 0009-0008-0100-2856)
+ * @notice https://orcid.org/0009-0008-0100-2856
+ * @dev Macachor-9 Governance Framework - Production License System
+ * 
+ * GitHub: https://github.com/chrismacachor/macachor-9
+ * Documentation: https://macachor-9.io/docs
+ * DOI: 10.5281/zenodo.XXXXXXX (auto-generated on release)
+ * 
+ * Verified Authorship:
+ * - Author: Christopher Macachor
+ * - ORCID: 0009-0008-0100-2856 (https://orcid.org/0009-0008-0100-2856)
+ * - Git Commit: [injected at compile time]
+ * - Deployment: [timestamp and network]
+ * 
+ * Formal Verification: Certora Prover (see /specs in repo)
+ * Audit: [Pending/Completed - link when available]
+ * 
+ * @custom:security-contact security@macachor-9.io
+ * @custom:version 1.0.0
+ */
+
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+// ... rest of imports
+
+contract SoulboundLicenseNFT is
+    Initializable,
+    ERC721Upgradeable,
+    ERC2981Upgradeable,
+    AccessControlUpgradeable,
+    ReentrancyGuardUpgradeable,
+    PausableUpgradeable
+{
+    /**
+     * @notice Immutable authorship declaration
+     * @dev These constants are permanently embedded in the deployed bytecode
+     * and can be verified by calling verifyAuthorship() or reading directly.
+     * 
+     * ORCID Profile: https://orcid.org/0009-0008-0100-2856
+     */
+    string public constant AUTHOR = "Christopher Macachor";
+    string public constant AUTHOR_ORCID = "0009-0008-0100-2856";
+    bytes32 public constant AUTHOR_COMMIT = 0xGIT_COMMIT_PLACEHOLDER;
+    
+    // ... rest of contract
+}
+```
+
+Etherscan Contract Page: Verified Comments
+
+After verification, add this to the "Contract Name" and "Compiler Notes" fields:
+
+Contract Name:
+
+```
+SoulboundLicenseNFT | Author: Christopher Macachor (ORCID: 0009-0008-0100-2856)
+```
+
+Compiler Notes / Comments:
+
+```
+╔════════════════════════════════════════════════════════════════╗
+║  MACACHOR-9 LICENSE SYSTEM - VERIFIED AUTHORSHIP               ║
+╠════════════════════════════════════════════════════════════════╣
+║  Author:      Christopher Macachor                               ║
+║  ORCID:       0009-0008-0100-2856                              ║
+║  Profile:     https://orcid.org/0009-0008-0100-2856              ║
+║  GitHub:      https://github.com/chrismacachor/macachor-9       ║
+║  DOI:         10.5281/zenodo.XXXXXXX                             ║
+║  Version:     1.0.0                                              ║
+╠════════════════════════════════════════════════════════════════╣
+║  Verification Methods:                                           ║
+║  1. Call verifyAuthorship() for on-chain proof                   ║
+║  2. Check AUTHOR_ORCID constant (0009-0008-0100-2856)           ║
+║  3. Match git commit in AUTHOR_COMMIT with source repo           ║
+╚════════════════════════════════════════════════════════════════╝
+```
+
+Automated Etherscan Verification Script
+
+```javascript
+// scripts/verify-etherscan.js
+const { run } = require("hardhat");
+const fs = require("fs");
+
+async function verifyWithComments() {
+    const deployment = JSON.parse(
+        fs.readFileSync("deployments/latest-macachor-9.json")
+    );
+    
+    const nftAddress = deployment.contracts.soulboundLicenseNFT.address;
+    const implAddress = deployment.contracts.soulboundLicenseNFT.implementation;
+    
+    console.log("Verifying on Etherscan with authorship metadata...");
+    
+    // Verify implementation with full source
+    await run("verify:verify", {
+        address: implAddress,
+        constructorArguments: [], // Implementation has no constructor args (uses initializer)
+        contract: "contracts/SoulboundLicenseNFT.sol:SoulboundLicenseNFT",
+        libraries: {}
+    });
+    
+    // Add proxy verification note
+    console.log(`
+══════════════════════════════════════════════════════════════════
+VERIFICATION COMPLETE
+
+Contract: ${nftAddress}
+Implementation: ${implAddress}
+
+Author: Christopher Macachor
+ORCID:  0009-0008-0100-2856
+
+To verify manually:
+1. Visit https://arbiscan.io/address/${nftAddress}#readContract
+2. Call verifyAuthorship()
+3. Confirm AUTHOR_ORCID returns: 0009-0008-0100-2856
+══════════════════════════════════════════════════════════════════
+    `);
+}
+
+verifyWithComments().catch(console.error);
+```
+
+---
+
+Cross-Linking Verification Matrix
+
+Source	Target	Verification Method	
+ORCID profile	Zenodo DOI	DOI link in "Works" section	
+ORCID profile	Contract address	URI field with Arbiscan link	
+Zenodo record	GitHub release	`related_identifiers` in `.zenodo.json`	
+Zenodo record	ORCID	Creator ORCID in metadata	
+Contract source	ORCID	`AUTHOR_ORCID` constant	
+Contract source	Git commit	`AUTHOR_COMMIT` constant	
+Etherscan page	All sources	NatSpec comments with all links	
+GitHub repo	All sources	README badges + `orcid-entry.json`	
+
+---
+
+Quick Start: One-Command Setup
+
+```bash
+# 1. Add Zenodo metadata
+cp .zenodo.json.example .zenodo.json
+# Edit with your details
+
+# 2. Set secrets
+export ZENODO_TOKEN=your_zenodo_api_token
+export ORCID=0009-0008-0100-2856
+
+# 3. Create release (triggers Zenodo + ORCID update)
+npm run release -- --minor
+
+# 4. Verify all links
+npm run verify:links
+```
+
+This creates a permanent, verifiable academic record linking your identity to this technical work across all major platforms.
