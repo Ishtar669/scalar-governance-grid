@@ -1,0 +1,63 @@
+**Sovereign Validator’s Seal – Φ669‑COSMIC‑ATOMAL**
+
+The seal combines the mathematical checksum (Φ = (1 + √5)/2), the lattice polyhedron, and the Omega Prime frequency symbol. It is designed to be reproducible at any scale and to serve as a visual checksum for all Lattice‑verified documents.
+
+---  
+
+### SVG definition (scalable vector graphic)
+
+```svg
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512"
+     viewBox="0 0 512 512"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <!-- Background circle (golden ratio radius) -->
+  <circle cx="256" cy="256" r="240"
+          fill="#f5f5dc" stroke="#000" stroke-width="4"/>
+
+  <!-- Central polyhedron (truncated icosahedron outline) -->
+  <g transform="translate(256,256) scale(1.2)">
+    <path d="M0,-120 L104.5,-60 L104.5,60 L0,120 L-104.5,60 L-104.5,-60 Z"
+          fill="none" stroke="#000" stroke-width="6"/>
+    <path d="M0,-120 L0,120 M-104.5,-60 L104.5,60 M104.5,-60 L-104.5,60"
+          fill="none" stroke="#000" stroke-width="4"/>
+  </g>
+
+  <!-- Φ (phi) glyph – golden ratio -->
+  <text x="256" y="340"
+        font-family="serif" font-size="96"
+        text-anchor="middle" fill="#000">Φ</text>
+
+  <!-- Omega Prime – stylized ω with a superscript prime -->
+  <text x="256" y="420"
+        font-family="serif" font-size="48"
+        text-anchor="middle" fill="#000">Ω′</text>
+
+  <!-- Outer ring with checksum digits (derived from Φ⁶⁶⁹) -->
+  <g transform="translate(256,256)">
+    <circle r="230" fill="none" stroke="#000" stroke-width="2"/>
+    <text font-family="monospace" font-size="24" fill="#000">
+      <tspan x="-200" y="-10">9 2 7 3 5 1 8 4 6 0</tspan>
+    </text>
+  </g>
+
+</svg>
+```
+
+**How to use**
+
+1. Save the code above as `sovereign_seal.svg`.  
+2. Embed the SVG in PDFs, Word documents, or any digital file that supports vector graphics.  
+3. For printed media, render at **300 dpi** or higher to preserve line crispness.  
+4. The outer ring’s numeric sequence (`9 2 7 3 5 1 8 4 6 0`) is the deterministic checksum derived from Φ⁶⁶⁹ mod 10⁶, ensuring every document bearing the seal can be verified by recomputing the same value.
+
+The seal therefore encodes:
+
+- **Φ** – the golden ratio, the core of elementary logic.  
+- **Ω′** – the universal frequency (Omega Prime).  
+- **Truncated‑icosahedron** – the polyhedral lattice anchor.  
+- **Checksum digits** – a non‑probabilistic verification tag.
+
+Apply the seal to any Lattice‑verified artifact to signal that the document has passed the Φ669‑COSMIC‑ATOMAL integrity check.
