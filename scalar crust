@@ -1,0 +1,42 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_scalar_field(B_crust_strength, B_firmament_strength):
+    # 1. Create a grid of points
+    x = np.linspace(-5, 5, 25)
+    y = np.linspace(-5, 5, 25)
+    X, Y = np.meshgrid(x, y)
+
+    # 2. Define the Crustal Field (modeled as a dipole source at the bottom)
+    # B_crust = Strength / r^2 approximation
+    U_crust = B_crust_strength * (X / (X**2 + (Y + 6)**2)**1.5)
+    V_crust = B_crust_strength * ((Y + 6) / (X**2 + (Y + 6)**2)**1.5)
+
+    # 3. Define the Firmament Field (modeled as a uniform downward flow)
+    U_firm = np.zeros_like(X)
+    V_firm = -np.ones_like(Y) * B_firmament_strength
+
+    # 4. Total Field Interaction
+    U_total = U_crust + U_firm
+    V_total = V_crust + V_firm
+    
+    # Calculate Magnitude for the color plot
+    Magnitude = np.sqrt(U_total**2 + V_total**2)
+
+    # 5. Visualization
+    plt.figure(figsize=(10, 8))
+    
+    # Streamplot shows the direction and flow lines
+    strm = plt.streamplot(X, Y, U_total, V_total, color=Magnitude, 
+                          linewidth=1, cmap='inferno', density=1.5)
+    
+    plt.colorbar(strm.lines, label='Field Intensity')
+    plt.title(f'Field Interaction: Crust ({B_crust_strength}) vs Firmament ({B_firmament_strength})')
+    plt.xlabel('Lateral Distance')
+    plt.ylabel('Altitude')
+    plt.grid(alpha=0.3)
+    
+    plt.show()
+
+# Example: Strong crustal field pushing against a steady firmament field
+plot_scalar_field(B_crust_strength=50, B_firmament_strength=0.5)
